@@ -10,8 +10,11 @@ import os
 import time
 import glob
 import numpy as np
-from scipy.sparse import lil_matrix, dok_matrix, csr_matrix, hstack
+from scipy.sparse import lil_matrix, dok_matrix, csr_matrix
 from scipy.special import digamma, polygamma
+from scipy.stats import chi2
+from numpy.linalg import inv
+from statsmodels.discrete.discrete_model import NegativeBinomial
 from subprocess import call
 try:
     import cPickle as pickle
@@ -156,6 +159,42 @@ def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
     if cur_iter+1 == max_iters:
         LOG.warn('Reached the maximum number of iterations')
     return lamb, mu, phi, err
+
+
+def extra_zero_test(y, X, G=None):
+    if G is None:
+        G = X
+    n = len(y)
+    ind = (y == 0).astype(int)
+    df = max(X.shape[1], G.shape[1])
+    nb = NegativeBinomial(y, X).fit()
+    k_hat = nb.params[-1]
+    B_hat = nb.params[:-1]
+    tau_h = np.exp(X.dot(B_hat))
+    N = 1 + k_hat*tau_h
+    L = 1/k_hat
+    bb1 = tau_h / N
+    I_bb = np.matmul(np.matmul(X.T, np.diag(bb1)), X)
+    D = N**2 * (N**L - 1)
+    aa = tau_h**2 / D
+    I_aa = np.matmul(np.matmul(G.T, np.diag(aa)), G)
+    I_ab = np.matmul(np.matmul(G.T, -np.diag(aa)), X)
+    I_ak = np.matmul(G.T, tau_h * (k_hat**(-2) * N * np.log(N) - tau_h/k_hat) / D)
+    I_bk = np.zeros(X.shape[1])
+    K = k_hat**(-4) + 2*k_hat**(-3)
+    I_kk = sum(2*np.log(N)/k_hat**3 +
+           tau_h * (1 - 2/N) / k_hat**2 -
+           tau_h**2 * (tau_h + L/N) / N**2 +
+           (1 - N**(-L)) * K * polygamma(1, L+1) -
+           K / n * sum((1-ind)*polygamma(1, y+L+1)))
+    I_abk = np.hstack((I_ab, I_ak[:, np.newaxis]))
+    I_bbkk = np.vstack((np.hstack((I_bb, I_bk[:, np.newaxis])), np.hstack((I_bk, I_kk))))
+    HH = I_aa - np.matmul(np.matmul(I_abk, inv(I_bbkk)), I_abk.T)
+    gg = ind * tau_h / N - (1-ind) * tau_h / (N**(L+1) - N)
+    U = G.T.dot(gg)
+    test_S = U.dot(inv(HH)).dot(U)
+    pvalue = 1 - chi2.cdf(test_S, df)
+    return test_S, pvalue
 
 
 def score_test(cntfile):
