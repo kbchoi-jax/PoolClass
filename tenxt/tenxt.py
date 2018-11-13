@@ -104,23 +104,17 @@ def __em4tgx(cntmat, scaler, percentile, tol, max_iters):
 
 
 def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
-    cntmat_scaled = cntmat.copy()
-    cntmat_scaled.data = cntmat_scaled.data / scaler[cntmat_scaled.indices]
-    # libsz_scaled = np.squeeze(np.asarray(cntmat_scaled.sum(axis=0)))
-    ridx = np.repeat(np.arange(cntmat.shape[0]), np.diff(cntmat.indptr))
     #
     # Initial mu and phi
     #
-    x_nnz = np.squeeze(np.asarray((cntmat > 0).sum(axis=1)))
-    mean_x_scaled = np.squeeze(np.asarray(cntmat_scaled.sum(axis=1))) / x_nnz
-    mean_x_scaled_square = np.squeeze(np.asarray(cntmat_scaled.power(2).sum(axis=1))) / x_nnz
-    var_x_scaled = mean_x_scaled_square - np.power(mean_x_scaled, 2)
+    cntmat_scaled = cntmat / scaler
+    mean_x_scaled = cntmat_scaled.mean(axis=1)
+    var_x_scaled = cntmat_scaled.var(axis=1)
     phi = var_x_scaled / mean_x_scaled - 1
     phi[phi < 0] = 0.001
     mu = mean_x_scaled / phi
-    p = cntmat.copy()
-    lamb = cntmat.copy()
-    log_lamb = cntmat.copy()
+    phi = np.squeeze(np.asarray(phi))
+    mu = np.squeeze(np.asarray(mu))
 
     for cur_iter in range(max_iters):
         #
@@ -131,20 +125,18 @@ def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
         #
         # E-step
         #
-        p.data = phi[ridx] / (scaler[cntmat.indices]*phi[ridx] + 1)
-        x_plus_mu = cntmat.copy()
-        x_plus_mu.data += mu[ridx]
-        lamb.data = x_plus_mu.data * p.data
-        mean_lamb = np.squeeze(np.asarray(lamb.sum(axis=1))) / x_nnz
-        log_lamb.data = digamma(x_plus_mu.data) + np.log(p.data)
-        mean_log_lamb = np.squeeze(np.asarray(log_lamb.sum(axis=1))) / x_nnz
-        suff = np.log(mean_lamb) - mean_log_lamb
+        p = (1 / (np.outer(scaler, phi) + 1) * phi).T
+        x_plus_mu = np.add(cntmat, mu[:, np.newaxis])
+        lamb = np.multiply(x_plus_mu, p)
+        mean_lamb = lamb.mean(axis=1)
+        log_lamb = digamma(x_plus_mu) + np.log(p)
+        suff = np.log(mean_lamb) - log_lamb.mean(axis=1)
 
         #
         # M-step
         #
-        mu = __update_shape(suff, tol, max_iters)
-        phi = mean_lamb / mu
+        mu = __update_shape(np.squeeze(np.asarray(suff)), tol, max_iters)
+        phi = np.divide(np.squeeze(np.asarray(mean_lamb)), mu)
 
         #
         # Check termination
