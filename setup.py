@@ -12,6 +12,7 @@ with open('README.rst') as readme_file:
 requirements = ['Click>=6.0',
                 'numpy',
                 'scipy',
+                'statsmodels',
                 'future' ]
 
 setup_requirements = [ ]

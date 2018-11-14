@@ -153,13 +153,13 @@ def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
     return lamb, mu, phi, err
 
 
-def extra_zero_test(y, X, G=None):
+def __ez_test(y, X, G=None, offset=None, exposure=None):
     if G is None:
         G = X
     n = len(y)
-    ind = (y == 0).astype(int)
+    ind = np.squeeze((y == 0)).astype(int)
     df = max(X.shape[1], G.shape[1])
-    nb = NegativeBinomial(y, X).fit()
+    nb = NegativeBinomial(y, X, offset=offset, exposure=exposure).fit()
     k_hat = nb.params[-1]
     B_hat = nb.params[:-1]
     tau_h = np.exp(X.dot(B_hat))
@@ -181,13 +181,21 @@ def extra_zero_test(y, X, G=None):
            K / n * sum((1-ind)*polygamma(1, y+L+1)))
     I_abk = np.hstack((I_ab, I_ak[:, np.newaxis]))
     I_bbkk = np.vstack((np.hstack((I_bb, I_bk[:, np.newaxis])), np.hstack((I_bk, I_kk))))
-    HH = I_aa - np.matmul(np.matmul(I_abk, inv(I_bbkk)), I_abk.T)
+    try:
+        HH = I_aa - np.matmul(np.matmul(I_abk, inv(I_bbkk)), I_abk.T)
+    except np.linalg.LinAlgError:
+        LOG.warn("Singular matrix error: %d/%d nonzero data points" % ((y>0).sum(), n))
+        return (-1, -1)
     gg = ind * tau_h / N - (1-ind) * tau_h / (N**(L+1) - N)
     U = G.T.dot(gg)
-    test_S = U.dot(inv(HH)).dot(U)
-    pvalue = 1 - chi2.cdf(test_S, df)
-    return test_S, pvalue
+    try:
+        test_S = U.dot(inv(HH)).dot(U)
+        pvalue = 1 - chi2.cdf(test_S, df)
+        return test_S, pvalue
+    except np.linalg.LinAlgError:
+        LOG.warn("Singular matrix error: %d/%d nonzero data points" % ((y>0).sum(), n))
+        return (-1, -1)
 
 
-def score_test(cntfile):
+def extra_zero_test(cntfile):
     raise NotImplementedError('Coming soon!')
