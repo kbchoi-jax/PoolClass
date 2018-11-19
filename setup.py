@@ -48,6 +48,9 @@ setup(
     keywords='tenxt',
     name='tenxt',
     packages=find_packages(include=['tenxt']),
+    scripts=[
+        'scripts/run_score_test_on_cluster.sh',
+    ],
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
