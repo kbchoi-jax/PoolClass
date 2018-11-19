@@ -33,6 +33,8 @@ def extra_zero_test(npzfile, common_scale, outfile, verbose):
 @main.command()
 @click.argument('loomfile', metavar='<loomfile>', type=click.Path(exists=True, dir_okay=False))
 @click.option('-c', '--chunk', metavar='<chunk_size>', type=int, default=25, help='Number of genes in each chunk')
+@click.option('-r', '--common-scale', metavar='<common_scale>', type=float, default=10000,
+help='Read counts per cell after scaliing (default: 10000)')
 @click.option('-o', '--outdir', metavar='<outdir>', type=click.Path(exists=True, resolve_path=True, file_okay=False), default='.',
 help='Folder name to store parameter files')
 @click.option('--email', metavar='<email>', type=str, default=None, help='Notification E-mail')
@@ -42,12 +44,12 @@ help='Folder name to store parameter files')
 @click.option('--systype', metavar='<systype>', default='pbs', help='Type of HPC cluster system (default: pbs)')
 @click.option('--dryrun', is_flag=True, help='Use this when you want to rehearse your submit commands')
 @click.option('-v', '--verbose', count=True, help='\'-v\' is Level 1 and \'-vv\' is Level 2')
-def submit(loomfile, chunk, outdir, email, queue, mem, walltime, systype, dryrun, verbose):
+def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun, verbose):
     """
     Submits scBASE fitting jobs to HPC clusters
     """
     utils.configure_logging(verbose)
-    tenxt.submit(loomfile, chunk, outdir, email, queue, mem, walltime, systype, dryrun)
+    tenxt.submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun)
 
 
 if __name__ == "__main__":

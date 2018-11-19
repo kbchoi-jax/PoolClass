@@ -226,7 +226,7 @@ def extra_zero_test(npzfile, common_scale, outfile=None):
     fhout.close()
 
 
-def submit(loomfile, chunk, outdir, email, queue, mem, walltime, systype, dryrun):
+def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun):
     LOG.warn('Count file: %s' % loomfile)
     LOG.warn('HPC system type: %s' % systype)
     if dryrun:
@@ -263,7 +263,7 @@ def submit(loomfile, chunk, outdir, email, queue, mem, walltime, systype, dryrun
                 data_dict['Selected'] = np.ones(len(genes))  # select all
                 np.savez_compressed(infile, **data_dict)
             outfile = os.path.join(outdir, 'tenxt.score_test.%05d-%05d.tsv' % (start, end))
-            job_par = 'OUTFILE=%s,INFILE=%s' % (outfile, infile)
+            job_par = 'SCALE=%d,OUTFILE=%s,INFILE=%s' % (common_scale, outfile, infile)
             cmd = ['qsub']
             if email is not None:
                 cmd += ['-M', email]
