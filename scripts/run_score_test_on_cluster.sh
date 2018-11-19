@@ -4,6 +4,6 @@
 source activate tenxt
 cd $PBS_O_WORKDIR
 
-scbase extra-zero-test -o ${OUTFILE} ${INFILE}
+tenxt extra-zero-test -o ${OUTFILE} ${INFILE}
 
 source deactivate
