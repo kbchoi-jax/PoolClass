@@ -200,20 +200,23 @@ def __ez_test(y, X, G=None, offset=None, exposure=None):
 
 def extra_zero_test(npzfile, common_scale, outfile=None):
     if outfile is None:
-        outfile = os.os.path.basename(npzfile)
+        outfile = os.path.join(os.path.dirname(npzfile), 'tenxt.score_test.tsv')
+    LOG.warn('Name of output file: %s' % outfile)
     fhout = open(outfile, 'w')
     fh = np.load(npzfile)
     dmat = fh['Counts']
-    cellsz = fh['Size']
-    expo = cellsz / common_scale
     num_genes, num_cells = dmat.shape
+    LOG.warn('The number of genes = %d' % num_genes)
+    LOG.warn('The number of cells = %d' % num_cells)
+    expo = fh['Size'] / common_scale
     X = np.ones((num_cells, 1))
     for g in range(num_genes):
-        y = np.asarray(dmat[g].todense().T)
-        if (y>0).sum() > 0:
+        y = dmat[g][:, np.newaxis]
+        nnz = (y>0).sum()
+        if nnz > 0:
             chi2val, pvalue = __ez_test(y, X, exposure=expo)
             if chi2val != -1 and pvalue != -1:
-                fhout.write('%s\t%.6f\t%.6f\n' % (fh['GeneID'], chi2val, pvalue))
+                fhout.write('%s\t%d\t%.6f\t%.6f\n' % (fh['GeneID'][g], nnz, chi2val, pvalue))
     fhout.close()
 
 
@@ -222,7 +225,6 @@ def submit(loomfile, chunk, outdir, email, queue, mem, walltime, systype, dryrun
     LOG.warn('HPC system type: %s' % systype)
     if dryrun:
         LOG.warn('Showing submission script only')
-
     with loompy.connect(loomfile, 'r') as ds:
         gsurv = np.where(ds.ra.Selected)[0]
         num_gsurv = len(gsurv)
@@ -231,7 +233,6 @@ def submit(loomfile, chunk, outdir, email, queue, mem, walltime, systype, dryrun
         LOG.warn('The number of selected cells: %d' % num_cells)
         LOG.warn('%d jobs will be submitted' % int(np.ceil(num_gsurv/chunk)))
     processed = 0
-
     if systype == 'pbs':
         tot_layer = ''
         for idx_start in xrange(0, num_gsurv, chunk):
