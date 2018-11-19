@@ -203,20 +203,26 @@ def extra_zero_test(npzfile, common_scale, outfile=None):
         outfile = os.path.join(os.path.dirname(npzfile), 'tenxt.score_test.tsv')
     LOG.warn('Name of output file: %s' % outfile)
     fhout = open(outfile, 'w')
+    fhout.write('#TargetID\tNum_Zeros\tNum_Samples\tChi_sq\tP-value\n')
     fh = np.load(npzfile)
     dmat = fh['Counts']
     num_genes, num_cells = dmat.shape
     LOG.warn('The number of genes = %d' % num_genes)
     LOG.warn('The number of cells = %d' % num_cells)
-    expo = fh['Size'] / common_scale
+    if common_scale > 0:
+        LOG.warn('Common scale: %d' % common_scale)
+        expo = fh['Size'] / common_scale
+    else:
+        LOG.warn('Offset/Exposure will not be used')
+        expo = None
     X = np.ones((num_cells, 1))
     for g in range(num_genes):
         y = dmat[g][:, np.newaxis]
         nnz = (y>0).sum()
         if nnz > 0:
             chi2val, pvalue = __ez_test(y, X, exposure=expo)
-            if chi2val != -1 and pvalue != -1:
-                fhout.write('%s\t%d\t%.6f\t%.6f\n' % (fh['GeneID'][g], nnz, chi2val, pvalue))
+            if chi2val != -1 and not np.isnan(chi2val) and pvalue != -1 and not np.isnan(pvalue):
+                fhout.write('%s\t%d\t%d\t%.6f\t%.5g\n' % (fh['GeneID'][g], num_cells-nnz, num_cells, chi2val, pvalue))
     fhout.close()
 
 
