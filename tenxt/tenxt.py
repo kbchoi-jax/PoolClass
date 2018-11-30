@@ -16,6 +16,7 @@ from scipy.stats import chi2
 from numpy.linalg import inv
 from statsmodels.discrete.discrete_model import NegativeBinomial
 import loompy
+import pandas as pd
 from subprocess import call
 try:
     import cPickle as pickle
@@ -205,17 +206,22 @@ def extra_zero_test(npzfile, common_scale, outfile=None):
     fhout = open(outfile, 'w')
     fhout.write('#TargetID\tNum_Zeros\tNum_Samples\tChi_sq\tP-value\n')
     fh = np.load(npzfile)
-    dmat = fh['Counts']
+    gsurv = np.where(fh['Selected'])[0]
+    csurv = np.where(fh['CellType'] != 'NA')[0]
+    ctype = fh['CellType'][csurv]
+    dmat = fh['Counts'][:, csurv]
+    dmat = dmat[gsurv, :]
     num_genes, num_cells = dmat.shape
     LOG.warn('The number of genes = %d' % num_genes)
     LOG.warn('The number of cells = %d' % num_cells)
     if common_scale > 0:
         LOG.warn('Common scale: %d' % common_scale)
-        expo = fh['Size'] / common_scale
+        expo = fh['Size'][csurv] / common_scale
     else:
         LOG.warn('Offset/Exposure will not be used')
         expo = None
-    X = np.ones((num_cells, 1))
+    #X = np.ones((num_cells, 1))
+    X = pd.get_dummies(ctype)
     for g in range(num_genes):
         y = dmat[g][:, np.newaxis]
         nnz = (y>0).sum()
@@ -260,6 +266,7 @@ def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, s
                 data_dict['GeneID'] = ds.ra.GeneID[genes]
                 data_dict['Counts'] = ds.layers[tot_layer][genes, :]
                 data_dict['Size'] = ds.ca.Size
+                data_dict['CellType'] = ds.ca.CellType
                 data_dict['Selected'] = np.ones(len(genes))  # select all
                 np.savez_compressed(infile, **data_dict)
             outfile = os.path.join(outdir, 'tenxt.score_test.%05d-%05d.tsv' % (start, end))
