@@ -1,6 +1,6 @@
-=====
-TENXT
-=====
+=========
+PoolClass
+=========
 
 
 .. image:: https://img.shields.io/pypi/v/tenxt.svg
@@ -16,7 +16,7 @@ A flexible python framework for single-cell sequencing data analysis
 
 
 * Free software: MIT license
-* Documentation: https://churchill-lab.github.io/TENXT.
+* Documentation: https://churchill-lab.github.io/PoolClass.
 
 
 How to cite
