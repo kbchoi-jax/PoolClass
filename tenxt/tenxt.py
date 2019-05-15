@@ -155,6 +155,65 @@ def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
     return lamb, mu, phi, err
 
 
+def run_em(loomfile, model, common_scale, percentile, hapcode, start, end, tol, max_iters, outfile):
+    if model == 'normalizing' and model == 'pooling':
+        raise RuntimeError('At least either of ASE or TGX model should be specified.')
+    # TGX model
+    with loompy.connect(loomfile) as ds:
+        num_genes, num_cells = ds.shape
+        LOG.info('Loading data from %s' % loomfile)
+        origmat = ds.sparse().tocsr()
+        LOG.info('Processing data matrix')
+        if 'Selected' in ds.ca.keys():
+            csurv = np.where(ds.ca.Selected > 0)[0]
+            cntmat = origmat[:, csurv]
+        else:
+            csurv = np.arange(num_cells)
+            cntmat = origmat
+        LOG.info('The number of selected cells: %d' % len(csurv))
+        
+        libsz = np.squeeze(np.asarray(cntmat.sum(axis=0)))
+        scaler = libsz / common_scale
+        if 'Selected' in ds.ra.keys():
+            gsurv1 = ds.ra.Selected > 0
+        else:
+            gsurv1 = np.ones(num_genes)
+        gsurv2 = np.squeeze(np.asarray((cntmat > 0).sum(axis=1) > 0))
+        gsurv = np.where(np.logical_and(gsurv1, gsurv2))[0]
+        LOG.info('The number of selected genes: %d' % len(gsurv))
+        cntmat = cntmat[gsurv, :]
+        LOG.info('Running EM algorithm for TGX')
+        if model == 'normalizing':
+            lambda_mat, mu, phi, err = __em4tgx(cntmat, scaler, percentile, tol, max_iters)
+        elif model == 'pooling':
+            lambda_mat, mu, phi, err = __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters)
+        else:
+            raise NotImplementedError('Only Gamma-Poisson model is available for TGX in run_em.')
+        LOG.info('There were %d genes that converged below the tolerance level of %.1E' % (sum(err < tol), tol))
+        LOG.info('Saving results to %s' % loomfile)
+        resmat = csr_matrix((origmat.shape))
+        resmat.indptr = np.ones(resmat.indptr.shape, dtype='int') * lambda_mat.indptr[-1]
+        resmat.indptr[0] = 0
+        resmat_indptr_part = np.repeat(lambda_mat.indptr[1:-1], np.diff(gsurv))
+        resmat.indptr[1:len(resmat_indptr_part)+1] = resmat_indptr_part
+        resmat.indices = csurv[lambda_mat.indices]
+        resmat.data = lambda_mat.data
+        ds.layers['lambda'] = resmat
+        mu_res = dok_matrix((num_genes, 1), float)
+        mu_res[gsurv] = mu[:, np.newaxis]
+        ds.ra['mu'] = mu_res
+        phi_res = dok_matrix((num_genes, 1), float)
+        phi_res[gsurv] = phi[:, np.newaxis]
+        ds.ra['phi'] = phi_res
+        err_res = dok_matrix((num_genes, 1), float)
+        err_res[gsurv] = err[:, np.newaxis]
+        ds.ra['err'] = err_res
+        g_selected = dok_matrix((num_genes, 1), float)
+        g_selected[gsurv] = 1
+        ds.ra['Selected:TGX:EM'] = g_selected
+    LOG.info("Finished EM for TGX")
+
+
 def __ez_test(y, X, G=None, offset=None, exposure=None):
     if G is None:
         G = X
