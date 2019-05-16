@@ -155,16 +155,20 @@ def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
     return lamb, mu, phi, err
 
 
-def run_em(loomfile, model, common_scale, percentile, hapcode, start, end, tol, max_iters, outfile):
+def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
     if model == 'normalizing' and model == 'pooling':
-        raise RuntimeError('At least either of ASE or TGX model should be specified.')
-    # TGX model
+        raise RuntimeError('The model should be either \"normalizing\" or \"pooling\".')
     with loompy.connect(loomfile) as ds:
         num_genes, num_cells = ds.shape
         LOG.info('Loading data from %s' % loomfile)
-        origmat = ds.sparse().tocsr()
+        if model == 'normalizing':
+            origmat = ds.sparse().tocsr()
+        elif model == 'pooling':
+            origmat = ds.layers[''][:, :]
+        else:
+            raise NotImplementedError('Only Gamma-Poisson model is available for TGX in run_em.')
         LOG.info('Processing data matrix')
-        if 'Selected' in ds.ca.keys():
+        if 'Selected' in ds.ca.keys():  # Get selected cells
             csurv = np.where(ds.ca.Selected > 0)[0]
             cntmat = origmat[:, csurv]
         else:
@@ -174,7 +178,7 @@ def run_em(loomfile, model, common_scale, percentile, hapcode, start, end, tol, 
         
         libsz = np.squeeze(np.asarray(cntmat.sum(axis=0)))
         scaler = libsz / common_scale
-        if 'Selected' in ds.ra.keys():
+        if 'Selected' in ds.ra.keys():  # Get selected genes
             gsurv1 = ds.ra.Selected > 0
         else:
             gsurv1 = np.ones(num_genes)
