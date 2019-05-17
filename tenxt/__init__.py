@@ -11,6 +11,7 @@ _____  ____  _      _    _____
  | |  | |_  | |\ | \ \_/  | |  
  |_|  |_|__ |_| \| /_/ \  |_|  
                         v""" + __version__
+__all__ = ['.']
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
