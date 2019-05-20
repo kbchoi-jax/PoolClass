@@ -32,6 +32,24 @@ def extra_zero_test(npzfile, common_scale, outfile, verbose):
 
 @main.command()
 @click.argument('loomfile', metavar='<loomfile>', type=click.Path(exists=True, dir_okay=False))
+@click.option('-m', '--model', metavar='<tge_model>', type=str, default='pooling',
+help='This is a user option for running EM.')
+@click.option('-r', '--common-scale', metavar='<common_scale>', type=float, default=10000,
+help='Read counts per cell after scaliing (default: 10000)')
+@click.option('-p', '--percentile', metavar='<percentile>', type=int, default=50)
+@click.option('-t', '--tol', metavar='<tolerance>', type=float, default=0.000001, help='Tolerance for termination (default: 0.000001)')
+@click.option('-i', '--max-iters', metavar='<max_iters>', type=int, default=999, help='Max iterations for termination (default: 100)')
+@click.option('-v', '--verbose', count=True, help='\'-v\' is Level 1 and \'-vv\' is Level 2')
+def run_em(loomfile, model, common_scale, percentile, tol, max_iters, verbose):
+    """
+    Runs EM algorithm for either normalizing or pooling counts
+    """
+    utils.configure_logging(verbose)
+    poolclass.run_em(loomfile, model, common_scale, percentile, tol, max_iters)
+
+
+@main.command()
+@click.argument('loomfile', metavar='<loomfile>', type=click.Path(exists=True, dir_okay=False))
 @click.option('-c', '--chunk', metavar='<chunk_size>', type=int, default=25, help='Number of genes in each chunk')
 @click.option('-r', '--common-scale', metavar='<common_scale>', type=float, default=10000,
 help='Read counts per cell after scaliing (default: 10000)')
