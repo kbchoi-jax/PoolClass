@@ -220,6 +220,7 @@ def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
         ds.ra['err'] = err_res
         g_selected = dok_matrix((num_genes, 1), float)
         g_selected[gsurv] = 1
+        ds.ra['Selected:EM'] = g_selected
     LOG.info("Finished EM for TGE")
 
 
