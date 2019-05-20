@@ -4,7 +4,7 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
-from tenxt import __version__
+from poolclass import __version__
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -38,23 +38,23 @@ setup(
     description="A versatile python framework for single-cell sequencing data analysis",
     entry_points={
         'console_scripts': [
-            'tenxt=tenxt.cli:main',
+            'poolclass=poolclass.cli:main',
         ],
     },
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
     include_package_data=True,
-    keywords='tenxt',
-    name='tenxt',
-    packages=find_packages(include=['tenxt']),
+    keywords='poolclass',
+    name='poolclass',
+    packages=find_packages(include=['poolclass']),
     scripts=[
         'scripts/run_score_test_on_cluster.sh',
     ],
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/churchill-lab/tenxt',
+    url='https://github.com/churchill-lab/PoolClass',
     version=__version__,
     zip_safe=False,
 )

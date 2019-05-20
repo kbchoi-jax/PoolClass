@@ -47,7 +47,7 @@ def __update_shape(sufficient, tol=0.000001, max_iters=100):
     return shape
 
 
-def __em4tgx(cntmat, scaler, percentile, tol, max_iters):
+def __em4tge(cntmat, scaler, percentile, tol, max_iters):
     cntmat_scaled = cntmat.copy()
     cntmat_scaled.data = cntmat_scaled.data / scaler[cntmat_scaled.indices]
     # libsz_scaled = np.squeeze(np.asarray(cntmat_scaled.sum(axis=0)))
@@ -105,7 +105,7 @@ def __em4tgx(cntmat, scaler, percentile, tol, max_iters):
     return lamb, mu, phi, err
 
 
-def __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters):
+def __em4tge_dense(cntmat, scaler, percentile, tol, max_iters):
     #
     # Initial mu and phi
     #
@@ -166,7 +166,7 @@ def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
         elif model == 'pooling':
             origmat = ds.layers[''][:, :]
         else:
-            raise NotImplementedError('Only Gamma-Poisson model is available for TGX in run_em.')
+            raise NotImplementedError('Only Gamma-Poisson model is available for TGE in run_em.')
         LOG.info('Processing data matrix')
         if 'Selected' in ds.ca.keys():  # Get selected cells
             csurv = np.where(ds.ca.Selected > 0)[0]
@@ -186,22 +186,28 @@ def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
         gsurv = np.where(np.logical_and(gsurv1, gsurv2))[0]
         LOG.info('The number of selected genes: %d' % len(gsurv))
         cntmat = cntmat[gsurv, :]
-        LOG.info('Running EM algorithm for TGX')
+        LOG.info('Running EM algorithm for TGE')
         if model == 'normalizing':
-            lambda_mat, mu, phi, err = __em4tgx(cntmat, scaler, percentile, tol, max_iters)
+            lambda_mat, mu, phi, err = __em4tge(cntmat, scaler, percentile, tol, max_iters)
         elif model == 'pooling':
-            lambda_mat, mu, phi, err = __em4tgx_dense(cntmat, scaler, percentile, tol, max_iters)
+            lambda_mat, mu, phi, err = __em4tge_dense(cntmat, scaler, percentile, tol, max_iters)
         else:
-            raise NotImplementedError('Only Gamma-Poisson model is available for TGX in run_em.')
+            raise NotImplementedError('Only Gamma-Poisson model is available for TGE in run_em.')
         LOG.info('There were %d genes that converged below the tolerance level of %.1E' % (sum(err < tol), tol))
         LOG.info('Saving results to %s' % loomfile)
-        resmat = csr_matrix((origmat.shape))
-        resmat.indptr = np.ones(resmat.indptr.shape, dtype='int') * lambda_mat.indptr[-1]
-        resmat.indptr[0] = 0
-        resmat_indptr_part = np.repeat(lambda_mat.indptr[1:-1], np.diff(gsurv))
-        resmat.indptr[1:len(resmat_indptr_part)+1] = resmat_indptr_part
-        resmat.indices = csurv[lambda_mat.indices]
-        resmat.data = lambda_mat.data
+        if model == 'normalizing':
+            resmat = csr_matrix((origmat.shape))
+            resmat.indptr = np.ones(resmat.indptr.shape, dtype='int') * lambda_mat.indptr[-1]
+            resmat.indptr[0] = 0
+            resmat_indptr_part = np.repeat(lambda_mat.indptr[1:-1], np.diff(gsurv))
+            resmat.indptr[1:len(resmat_indptr_part)+1] = resmat_indptr_part
+            resmat.indices = csurv[lambda_mat.indices]
+            resmat.data = lambda_mat.data
+        elif model == 'pooling':
+            resmat = np.zeros(origmat.shape)
+            resmat[gsurv, :][:, csurv] = lambda_mat
+        else:
+            raise NotImplementedError('Only Gamma-Poisson model is available for TGE in run_em.')
         ds.layers['lambda'] = resmat
         mu_res = dok_matrix((num_genes, 1), float)
         mu_res[gsurv] = mu[:, np.newaxis]
@@ -214,8 +220,7 @@ def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
         ds.ra['err'] = err_res
         g_selected = dok_matrix((num_genes, 1), float)
         g_selected[gsurv] = 1
-        ds.ra['Selected:TGX:EM'] = g_selected
-    LOG.info("Finished EM for TGX")
+    LOG.info("Finished EM for TGE")
 
 
 def __ez_test(y, X, G=None, offset=None, exposure=None):
@@ -264,7 +269,7 @@ def __ez_test(y, X, G=None, offset=None, exposure=None):
 
 def extra_zero_test(npzfile, common_scale, outfile=None):
     if outfile is None:
-        outfile = os.path.join(os.path.dirname(npzfile), 'tenxt.score_test.tsv')
+        outfile = os.path.join(os.path.dirname(npzfile), 'poolclass.score_test.tsv')
     LOG.warn('Name of output file: %s' % outfile)
     fhout = open(outfile, 'w')
     fhout.write('#TargetID\tNum_Zeros\tNum_Samples\tChi_sq\tP-value\n')
@@ -332,7 +337,7 @@ def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, s
                 data_dict['CellType'] = ds.ca.CellType
                 data_dict['Selected'] = np.ones(len(genes))  # select all
                 np.savez_compressed(infile, **data_dict)
-            outfile = os.path.join(outdir, 'tenxt.score_test.%05d-%05d.tsv' % (start, end))
+            outfile = os.path.join(outdir, 'poolclass.score_test.%05d-%05d.tsv' % (start, end))
             job_par = 'SCALE=%d,OUTFILE=%s,INFILE=%s' % (common_scale, outfile, infile)
             cmd = ['qsub']
             if email is not None:

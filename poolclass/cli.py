@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""Console script for tenxt."""
+"""Console script for poolclass"""
 import sys
 import click
-from . import tenxt
+from . import poolclass
 from . import utils
 from . import __logo__, __version__
 from . import get_data
@@ -12,7 +12,7 @@ from . import get_data
 @click.group()
 @click.version_option(version=__version__, message=__logo__)
 def main(args=None):
-    """Console script for tenxt"""
+    """Console script for poolclass"""
     return 0
 
 
@@ -27,7 +27,7 @@ def extra_zero_test(npzfile, common_scale, outfile, verbose):
     Tests if excess zeros exist
     """
     utils.configure_logging(verbose)
-    tenxt.extra_zero_test(npzfile, common_scale, outfile)
+    poolclass.extra_zero_test(npzfile, common_scale, outfile)
 
 
 @main.command()
@@ -49,7 +49,7 @@ def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, s
     Submits scBASE fitting jobs to HPC clusters
     """
     utils.configure_logging(verbose)
-    tenxt.submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun)
+    poolclass.submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun)
 
 
 if __name__ == "__main__":

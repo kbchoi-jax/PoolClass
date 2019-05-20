@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `tenxt` package."""
+"""Tests for `poolclass` package"""
 
 
 import unittest
 from click.testing import CliRunner
 
-from tenxt import tenxt
-from tenxt import cli
+from poolclass import poolclass
+from poolclass import cli
 
 
-class TestTenxt(unittest.TestCase):
-    """Tests for `tenxt` package."""
+class TestPoolClass(unittest.TestCase):
+    """Tests for `poolclass` package"""
 
     def setUp(self):
         """Set up test fixtures, if any."""
@@ -28,7 +28,7 @@ class TestTenxt(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(cli.main)
         assert result.exit_code == 0
-        assert 'tenxt.cli.main' in result.output
+        assert 'poolclass.cli.main' in result.output
         help_result = runner.invoke(cli.main, ['--help'])
         assert help_result.exit_code == 0
         assert '--help  Show this message and exit.' in help_result.output
