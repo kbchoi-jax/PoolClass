@@ -32,8 +32,8 @@ def extra_zero_test(npzfile, common_scale, outfile, verbose):
 
 @main.command()
 @click.argument('loomfile', metavar='<loomfile>', type=click.Path(exists=True, dir_okay=False))
-@click.option('-m', '--model', metavar='<tge_model>', type=str, default='pooling',
-help='This is a user option for running EM.')
+@click.option('-m', '--model', metavar='<model>', type=str, default='pooling',
+help='Purpose of running EM: normalizing or pooling')
 @click.option('-r', '--common-scale', metavar='<common_scale>', type=float, default=10000,
 help='Read counts per cell after scaliing (default: 10000)')
 @click.option('-p', '--percentile', metavar='<percentile>', type=int, default=50)
