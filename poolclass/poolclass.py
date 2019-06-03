@@ -301,66 +301,91 @@ def extra_zero_test(npzfile, common_scale, outfile=None):
     fhout.close()
 
 
-def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun):
+def extract_cells(loomfile, celltype):
+    pass
+
+
+def submit(loomfile, chunk, outdir, layer, dryrun, systype):
     LOG.warn('Count file: %s' % loomfile)
     LOG.warn('HPC system type: %s' % systype)
     if dryrun:
         LOG.warn('Showing submission script only')
-    with loompy.connect(loomfile, 'r') as ds:
-        gsurv = np.where(ds.ra.Selected)[0]
-        num_gsurv = len(gsurv)
-        num_genes, num_cells = ds.shape
-        LOG.warn('The number of selected genes: %d' % num_gsurv)
-        LOG.warn('The number of selected cells: %d' % num_cells)
-        LOG.warn('%d jobs will be submitted' % int(np.ceil(num_gsurv/chunk)))
-    processed = 0
+    if layer is not None:
+        LOG.warn('Loading data from %s layer' % layer)
     if systype == 'pbs':
-        tot_layer = ''
-        for idx_start in xrange(0, num_gsurv, chunk):
-            idx_end = min(idx_start+chunk, num_gsurv-1)
-            start = gsurv[idx_start]
-            if idx_end < num_gsurv-1:
-                end = gsurv[idx_end]
-                genes = gsurv[idx_start:idx_end]
-            else:  #idx_end == num_gsurv-1:
-                end = num_genes
-                genes = gsurv[idx_start:]
-            LOG.info('Chunk start: %d, end %d' % (start, end))
-            infile = os.path.join(outdir, '_chunk.%05d-%05d.npz' % (start, end))
-            LOG.debug('Genes: %s' % ' '.join(genes.astype(str)))
-            LOG.debug('Total %d genes submitted in this job' % len(genes))
-            data_dict = dict()
-            data_dict['shape'] = (len(genes), num_cells)
-            with loompy.connect(loomfile, 'r') as ds:
-                data_dict['GeneID'] = ds.ra.GeneID[genes]
-                data_dict['Counts'] = ds.layers[tot_layer][genes, :]
-                data_dict['Size'] = ds.ca.Size
-                data_dict['CellType'] = ds.ca.CellType
-                data_dict['Selected'] = np.ones(len(genes))  # select all
-                np.savez_compressed(infile, **data_dict)
-            outfile = os.path.join(outdir, 'poolclass.score_test.%05d-%05d.tsv' % (start, end))
-            job_par = 'SCALE=%d,OUTFILE=%s,INFILE=%s' % (common_scale, outfile, infile)
-            cmd = ['qsub']
-            if email is not None:
-                cmd += ['-M', email]
-            if queue is not None:
-                cmd += ['-q', queue]
-            if mem > 0:
-                cmd += ['-l', 'mem=%d' % mem]
-            if walltime > 0:
-                cmd += ['-l', 'walltime=%d:00:00' % walltime]
-            cmd += ['-v', job_par]
-            cmd += [os.path.join(os.path.dirname(os.environ['_']), 'run_score_test_on_cluster.sh')]
-            if dryrun:
-                print(" ".join(cmd))
-            else:
-                LOG.info(" ".join(cmd))
-                call(cmd)
-                time.sleep(1.0)
-            processed += len(genes)
-        LOG.debug('Total %d genes were submitted' % processed)
+        if layer is not None:
+            call('submit_jobs.R %s %d %s %d %s' % (loomfile, chunk, outdir, dryrun, layer), shell=True)
+        else:
+            call('submit_jobs.R %s %d %s %d' % (loomfile, chunk, outdir, dryrun), shell=True)
         LOG.warn('Job submission complete')
+    elif 'slurm':
+        raise NotImplementedError('SLURM submission is not yet supported')
     elif 'lsf':
         raise NotImplementedError('LSF submission is not yet supported')
     else:
         raise RuntimeError('No plan to support other job scheduling system until we see many requests')
+
+
+# def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun):
+#     LOG.warn('Count file: %s' % loomfile)
+#     LOG.warn('HPC system type: %s' % systype)
+#     if dryrun:
+#         LOG.warn('Showing submission script only')
+#     with loompy.connect(loomfile, 'r') as ds:
+#         gsurv = np.where(ds.ra.Selected)[0]
+#         num_gsurv = len(gsurv)
+#         num_genes, num_cells = ds.shape
+#         LOG.warn('The number of selected genes: %d' % num_gsurv)
+#         LOG.warn('The number of selected cells: %d' % num_cells)
+#         LOG.warn('%d jobs will be submitted' % int(np.ceil(num_gsurv/chunk)))
+#     processed = 0
+#     if systype == 'pbs':
+#         tot_layer = ''
+#         for idx_start in xrange(0, num_gsurv, chunk):
+#             idx_end = min(idx_start+chunk, num_gsurv-1)
+#             start = gsurv[idx_start]
+#             if idx_end < num_gsurv-1:
+#                 end = gsurv[idx_end]
+#                 genes = gsurv[idx_start:idx_end]
+#             else:  #idx_end == num_gsurv-1:
+#                 end = num_genes
+#                 genes = gsurv[idx_start:]
+#             LOG.info('Chunk start: %d, end %d' % (start, end))
+#             infile = os.path.join(outdir, '_chunk.%05d-%05d.npz' % (start, end))
+#             LOG.debug('Genes: %s' % ' '.join(genes.astype(str)))
+#             LOG.debug('Total %d genes submitted in this job' % len(genes))
+#             data_dict = dict()
+#             data_dict['shape'] = (len(genes), num_cells)
+#             with loompy.connect(loomfile, 'r') as ds:
+#                 data_dict['GeneID'] = ds.ra.GeneID[genes]
+#                 data_dict['Counts'] = ds.layers[tot_layer][genes, :]
+#                 data_dict['Size'] = ds.ca.Size
+#                 data_dict['CellType'] = ds.ca.CellType
+#                 data_dict['Selected'] = np.ones(len(genes))  # select all
+#                 np.savez_compressed(infile, **data_dict)
+#             outfile = os.path.join(outdir, 'poolclass.score_test.%05d-%05d.tsv' % (start, end))
+#             job_par = 'SCALE=%d,OUTFILE=%s,INFILE=%s' % (common_scale, outfile, infile)
+#             cmd = ['qsub']
+#             if email is not None:
+#                 cmd += ['-M', email]
+#             if queue is not None:
+#                 cmd += ['-q', queue]
+#             if mem > 0:
+#                 cmd += ['-l', 'mem=%d' % mem]
+#             if walltime > 0:
+#                 cmd += ['-l', 'walltime=%d:00:00' % walltime]
+#             cmd += ['-v', job_par]
+#             cmd += [os.path.join(os.path.dirname(os.environ['_']), 'run_score_test_on_cluster.sh')]
+#             if dryrun:
+#                 print(" ".join(cmd))
+#             else:
+#                 LOG.info(" ".join(cmd))
+#                 call(cmd)
+#                 time.sleep(1.0)
+#             processed += len(genes)
+#         LOG.debug('Total %d genes were submitted' % processed)
+#         LOG.warn('Job submission complete')
+#     elif 'lsf':
+#         raise NotImplementedError('LSF submission is not yet supported')
+#     else:
+#         raise RuntimeError('No plan to support other job scheduling system until we see many requests')

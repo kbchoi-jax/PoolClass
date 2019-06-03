@@ -51,23 +51,40 @@ def run_em(loomfile, model, common_scale, percentile, tol, max_iters, verbose):
 @main.command()
 @click.argument('loomfile', metavar='<loomfile>', type=click.Path(exists=True, dir_okay=False))
 @click.option('-c', '--chunk', metavar='<chunk_size>', type=int, default=25, help='Number of genes in each chunk')
-@click.option('-r', '--common-scale', metavar='<common_scale>', type=float, default=10000,
-help='Read counts per cell after scaliing (default: 10000)')
 @click.option('-o', '--outdir', metavar='<outdir>', type=click.Path(exists=True, resolve_path=True, file_okay=False), default='.',
 help='Folder name to store parameter files')
-@click.option('--email', metavar='<email>', type=str, default=None, help='Notification E-mail')
-@click.option('--queue', metavar='<queue>', type=str, default=None, help='Queue name')
-@click.option('--mem', metavar='<mem>', type=int, default=0, help='Memory in GB (default: 16GB)')
-@click.option('--walltime', metavar='<walltime>', type=int, default=0, help='Walltime in hours (default: 24h)')
-@click.option('--systype', metavar='<systype>', default='pbs', help='Type of HPC cluster system (default: pbs)')
 @click.option('--dryrun', is_flag=True, help='Use this when you want to rehearse your submit commands')
+@click.option('--layer', metavar='<layer>', type=str, default=None, help='Data layer in the loom file (default: None)')
+@click.option('--systype', metavar='<systype>', default='pbs', help='Type of HPC cluster system (default: pbs)')
 @click.option('-v', '--verbose', count=True, help='\'-v\' is Level 1 and \'-vv\' is Level 2')
-def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun, verbose):
+def submit(loomfile, chunk, outdir, layer, dryrun, systype, verbose):
     """
     Submits scBASE fitting jobs to HPC clusters
     """
     utils.configure_logging(verbose)
-    poolclass.submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun)
+    poolclass.submit(loomfile, chunk, outdir, layer, dryrun, systype)
+
+
+# @main.command()
+# @click.argument('loomfile', metavar='<loomfile>', type=click.Path(exists=True, dir_okay=False))
+# @click.option('-c', '--chunk', metavar='<chunk_size>', type=int, default=25, help='Number of genes in each chunk')
+# @click.option('-r', '--common-scale', metavar='<common_scale>', type=float, default=10000,
+# help='Read counts per cell after scaliing (default: 10000)')
+# @click.option('-o', '--outdir', metavar='<outdir>', type=click.Path(exists=True, resolve_path=True, file_okay=False), default='.',
+# help='Folder name to store parameter files')
+# @click.option('--email', metavar='<email>', type=str, default=None, help='Notification E-mail')
+# @click.option('--queue', metavar='<queue>', type=str, default=None, help='Queue name')
+# @click.option('--mem', metavar='<mem>', type=int, default=0, help='Memory in GB (default: 16GB)')
+# @click.option('--walltime', metavar='<walltime>', type=int, default=0, help='Walltime in hours (default: 24h)')
+# @click.option('--systype', metavar='<systype>', default='pbs', help='Type of HPC cluster system (default: pbs)')
+# @click.option('--dryrun', is_flag=True, help='Use this when you want to rehearse your submit commands')
+# @click.option('-v', '--verbose', count=True, help='\'-v\' is Level 1 and \'-vv\' is Level 2')
+# def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun, verbose):
+#     """
+#     Submits scBASE fitting jobs to HPC clusters
+#     """
+#     utils.configure_logging(verbose)
+#     poolclass.submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun)
 
 
 if __name__ == "__main__":

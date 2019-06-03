@@ -50,6 +50,14 @@ setup(
     packages=find_packages(include=['poolclass']),
     scripts=[
         'scripts/run_score_test_on_cluster.sh',
+        'scripts/compare_count_models.R',
+        'scripts/run_model_comparison.R',
+        'scripts/submit_jobs.R',
+        'scripts/submit_jobs.gene_range.R',
+        'scripts/submit_jobs.chunk_range.R',
+        'scripts/write.model_selections.R',
+        'scripts/collate_results.R',
+        'scripts/clean_up.sh'
     ],
     setup_requires=setup_requirements,
     test_suite='tests',
