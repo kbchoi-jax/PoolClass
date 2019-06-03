@@ -3,7 +3,7 @@
 import logging
 
 
-logging.basicConfig(format='[scBASE::%(funcName)s][%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+logging.basicConfig(format='[PoolClass::%(funcName)s][%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
 
 
 def get_logger():

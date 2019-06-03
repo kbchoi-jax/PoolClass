@@ -59,7 +59,7 @@ help='Folder name to store parameter files')
 @click.option('-v', '--verbose', count=True, help='\'-v\' is Level 1 and \'-vv\' is Level 2')
 def submit(loomfile, chunk, outdir, layer, dryrun, systype, verbose):
     """
-    Submits scBASE fitting jobs to HPC clusters
+    Submits model selection jobs to HPC clusters
     """
     utils.configure_logging(verbose)
     poolclass.submit(loomfile, chunk, outdir, layer, dryrun, systype)
@@ -81,7 +81,7 @@ def submit(loomfile, chunk, outdir, layer, dryrun, systype, verbose):
 # @click.option('-v', '--verbose', count=True, help='\'-v\' is Level 1 and \'-vv\' is Level 2')
 # def submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun, verbose):
 #     """
-#     Submits scBASE fitting jobs to HPC clusters
+#     Submits model selection jobs to HPC clusters
 #     """
 #     utils.configure_logging(verbose)
 #     poolclass.submit(loomfile, chunk, common_scale, outdir, email, queue, mem, walltime, systype, dryrun)
