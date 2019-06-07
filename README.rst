@@ -2,21 +2,11 @@
 PoolClass
 =========
 
-
-.. image:: https://img.shields.io/pypi/v/poolclass.svg
-        :target: https://pypi.python.org/pypi/poolclass
-
-.. image:: https://img.shields.io/travis/kbchoi-jax/poolclass.svg
-        :target: https://travis-ci.org/kbchoi-jax/poolclass
-
-
-
-
-A flexible python framework for single-cell sequencing data analysis
+PoolClass is a model selection-based scRNA-seq quantitation algorithm that controls overfitting and unwarranted imputation of technical zeros. We first fit UMI counts with Poisson, Negative-Binomial, and Zero-inflated Negative Binomial models. These models are applicable to UMI counts directly and therefore no need of arbitrary preprocessing of counts, e.g., normalization (by scaling to, for example, CPM) or log-transformation (with pseudocounts). Our model comparison enables us to compute denoised rates of gene expression using the best model which each gene data is conforming to.
 
 
 * Free software: MIT license
-* Documentation: https://churchill-lab.github.io/PoolClass.
+* Documentation: under development
 
 
 How to cite
