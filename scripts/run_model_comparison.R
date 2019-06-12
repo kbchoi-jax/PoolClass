@@ -22,7 +22,7 @@ m_zinb <- readRDS('zinb.rds')
 results <- list()
 processed <- c()
 
-for (gg in c(1:15)) {
+for (gg in c(1:num_genes)) {
   if(gsurv[gg]) {
     y <- round(unlist(cntmat[gg,]))
     cat(sprintf("\nTesting %s\n", gname[gg]))
