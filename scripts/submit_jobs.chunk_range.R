@@ -59,7 +59,10 @@ csize <- as.vector(colSums(dmat))
 scriptfile <- '/home/kbchoi/src/utils/submit_model_comparison_on_cluster.sh'
 rfile <- 'run_model_comparison.R'
 
-if (length(args) == 7) {
+if (length(args) == 6) {
+  cidx1 <- as.integer(args[5])
+  cidx2 <- as.integer(args[6])
+} else if (length(args) == 7) {
   cidx1 <- as.integer(args[6])
   cidx2 <- as.integer(args[7])
 } else {
