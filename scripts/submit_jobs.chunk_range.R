@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
-if (length(args) != 5 & length(args) != 7) {
+if (length(args) < 4 | length(args) > 7) {
   stop("Four, five , six or seven arguments must be supplied (<loomfile> <num_chunks> <outdir> <dryrun?> [<layer>] [<chunk_start> <chunk_end>])", call.=FALSE)
 }
 
