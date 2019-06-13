@@ -1,25 +1,30 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 5 & length(args) != 7) {
-  stop("Five or seven arguments must be supplied (<loomfile> <num_chunks> <outdir> <unique?> <dryrun?> [<chunk_start> <chunk_end>])", call.=FALSE)
+  stop("Four, five , six or seven arguments must be supplied (<loomfile> <num_chunks> <outdir> <dryrun?> [<layer>] [<chunk_start> <chunk_end>])", call.=FALSE)
 }
 
 library(loomR)
-nCores <- parallel::detectCores()
+nCores <- min(4, parallel::detectCores())
 
 loomfile <- args[1]
 num_chunks <- as.integer(args[2])
 outdir <-  args[3]
-unique <- as.integer(args[4])
-dryrun <- as.integer(args[5])
+dryrun <- as.integer(args[4])
+if (length(args) == 5 | length(args) == 7) {
+  layer <- args[5]
+  layer_is_given <- TRUE
+} else {
+  layer_is_given <- FALSE
+}
 
 ds <- connect(loomfile, mode = 'r+')
-if(unique) {
-  dmat <- ds$layers$unique[,]
-  cat('[submit_jobs] Unique read counts will be used.\n')
+if(layer_is_given) {
+  dmat <- ds$layers[[layer]][,]
+  cat(sprintf('[submit_jobs] Counts from %s layer will be loaded.\n', layer))
 } else {
   dmat <- ds$matrix[,]
-  cat('[submit_jobs] EMASE counts will be used.\n')
+  cat('[submit_jobs] Counts from main layer will be loaded.\n')
 }
 num_cells <- dim(dmat)[1]
 num_genes <- dim(dmat)[2]

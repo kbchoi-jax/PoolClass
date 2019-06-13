@@ -57,7 +57,7 @@ colnames(dmat) <- cname
 csize <- as.vector(colSums(dmat))
 
 scriptfile <- '/home/kbchoi/src/utils/submit_model_comparison_on_cluster.sh'
-rfile <- './run_model_comparison.R'
+rfile <- 'run_model_comparison.R'
 
 for (k in 1:length(gsets)) {
   s <- g_starts[k]
