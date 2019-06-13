@@ -9,17 +9,26 @@ outfile <- args[2]
 
 flist <- Sys.glob(sprintf('%s/_poolclass*', indir))
 flist <- sort(flist, decreasing = FALSE)
-results <- data.frame()
+results <- list()
 for (k in 1:length(flist)) {
   newres <- readRDS(flist[k])
-  results <- rbind(results, newres)
+  results <- c(results, newres)
 }
 saveRDS(results, file = outfile)
-results <- results[!is.na(rowSums(results)), ]
-best1 <- sum(results[,1]<0 & results[,3]<0)
-best2 <- sum(results[,1]>0 & results[,5]<0)
-best3 <- sum(results[,3]>0 & results[,5]>0)
-cat(sprintf('%5d Poisson genes\n', sum(best1)))
-cat(sprintf('%5d Negative Binomial genes\n', sum(best2)))
-cat(sprintf('%5d Zero-Inflated Neg. Binomial genes\n', sum(best3)))
-cat(sprintf('%5d Total\n', sum(best1, best2, best3)))
+bestmodel <- c(0, 0, 0, 0)
+for (res in results) {
+  if (rownames(res)[1] == 'model1') {
+    bestmodel[1] = bestmodel[1] + 1
+  } else if (rownames(res)[1] == 'model2') {
+    bestmodel[2] = bestmodel[2] + 1
+  } else if (rownames(res)[1] == 'model3') {
+    bestmodel[3] = bestmodel[3] + 1
+  } else if (rownames(res)[1] == 'model4') {
+    bestmodel[4] = bestmodel[4] + 1
+  }
+}
+cat(sprintf('%5d Poisson genes\n', bestmodel[1]))
+cat(sprintf('%5d Negative Binomial genes\n', bestmodel[2]))
+cat(sprintf('%5d Zero-Inflated Poisson genes\n', bestmodel[3]))
+cat(sprintf('%5d Zero-Inflated Neg. Binomial genes\n', bestmodel[4]))
+cat(sprintf('%5d Total\n', sum(bestmodel)))
