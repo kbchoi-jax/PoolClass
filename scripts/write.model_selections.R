@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)!=3) {
-  stop("Three arguments must be supplied (<loomfile> <loo_results> <attr_name)", call.=FALSE)
+  stop("Three arguments must be supplied (<loomfile> <loo_results> <attr_name>)", call.=FALSE)
 }
 
 loomfile <- args[1]
