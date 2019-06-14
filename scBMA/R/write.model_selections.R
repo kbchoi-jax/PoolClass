@@ -27,7 +27,7 @@ cat(sprintf('%5d Total\n', length(results)))
 
 ds <- connect(loomfile, mode='r+')
 gname <- ds$row.attrs$GeneID[]
-best_idx <- match(gsurv, gname)
+best_idx <- match(rownames(results), gname)
 bestmodel_fullsize <- rep(0, length(gname))
 bestmodel_fullsize[best_idx] <- bestmodel
 ra <- vector(mode="list", length=1)

@@ -103,3 +103,8 @@ ENV/
 
 # VS Code
 .vscode
+.Rproj.user
+
+# scBMA
+scBMA/.gitignore
+scBMA/packrat/lib*/
