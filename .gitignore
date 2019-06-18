@@ -106,5 +106,6 @@ ENV/
 .Rproj.user
 
 # scBMA
+.Rhistory
 scBMA/.gitignore
 scBMA/packrat/lib*/
