@@ -17,7 +17,33 @@ gsurv <- names(results)
 bestmodel <- c()
 for (g in gsurv) {
   res <- results[[g]]
-  bestmodel <- c(bestmodel, as.integer(gsub('model', '', rownames(res)[1])))
+  if (rownames(res)[1] == 'model1') {
+    bestmodel <- c(bestmodel, 1)
+  } else if (rownames(res)[1] == 'model2') {
+    if (abs(res['model1',][['elpd_diff']]) < 2 * res['model1',][['se_diff']]) {
+      bestmodel <- c(bestmodel, 1)
+    } else {
+      bestmodel <- c(bestmodel, 2)
+    }
+  } else if (rownames(res)[1] == 'model3') {
+    if (abs(res['model1',][['elpd_diff']]) < 2 * res['model1',][['se_diff']]) {
+      bestmodel <- c(bestmodel, 1)
+    } else if (abs(res['model2',][['elpd_diff']]) < 2 * res['model2',][['se_diff']]) {
+      bestmodel <- c(bestmodel, 2)
+    } else {
+      bestmodel <- c(bestmodel, 3)
+    }        
+  } else if (rownames(res)[1] == 'model4') {
+    if (abs(res['model1',][['elpd_diff']]) < 2 * res['model1',][['se_diff']]) {
+      bestmodel <- c(bestmodel, 1)
+    } else if (abs(res['model2',][['elpd_diff']]) < 2 * res['model2',][['se_diff']]) {
+      bestmodel <- c(bestmodel, 2)
+    } else if (abs(res['model3',][['elpd_diff']]) < 2 * res['model3',][['se_diff']]) {
+      bestmodel <- c(bestmodel, 3)
+    } else {
+      bestmodel <- c(bestmodel, 4)
+    }
+  }
 }
 cat(sprintf('%5d Poisson genes\n', sum(bestmodel==1)))
 cat(sprintf('%5d Negative Binomial genes\n', sum(bestmodel==2)))
