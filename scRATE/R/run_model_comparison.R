@@ -1,6 +1,3 @@
-#!/usr/bin/env Rscript
-#source('./compare_count_models.R')
-
 run_model_comparison <- function(cntfile, outfile, zip_model, zinb_model, nCores, seed) {
   nCores <- min(4, parallel::detectCores())
   load(cntfile)  # This will load 'cntmat', 'gsurv', and 'csize'
