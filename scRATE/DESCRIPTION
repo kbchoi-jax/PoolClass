@@ -4,8 +4,13 @@ Title: A scRNA-seq quantification toolkit based on Bayesian model selection
 Version: 0.1.0
 Author: Kwangbom "KB" Choi, Ph.D.
 Maintainer: Kwangbom "KB" Choi, Ph.D. <kb.choi@jax.org>
+<<<<<<< HEAD
 Description: Estimate gene expression rate using the best model to which count data conforms.
     Performs model selection based on posterior predictive checks.
+=======
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+>>>>>>> 9bb22e8c6a1be78d64691e920388ff62b01135db
 License: MIT
 Encoding: UTF-8
 LazyData: true
