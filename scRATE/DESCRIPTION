@@ -1,9 +1,9 @@
 Package: scRATE
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A scRNA-seq quantification toolkit based on Bayesian model selection
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Author: Kwangbom "KB" Choi, Ph.D.
+Maintainer: Kwangbom "KB" Choi, Ph.D. <kb.choi@jax.org>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: MIT
