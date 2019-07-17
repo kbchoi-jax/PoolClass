@@ -1,12 +1,18 @@
 #' Bayesian linear regression with Stan
 #'
 #' @export
-#' @param y Numeric vector of UMI counts.
-#' @param exposure Numeric vector of cell sizes (total UMI counts per cell).
-#' @param nCores Number of cores.
-#' @param seed Seed number.
-#' @param ... Arguments passed to `rstan::sampling` (e.g. iter, chains).
-#' @return A list of `stanfit` returned by four models: Poisson, Negative-Binomial, Zero-Inflated Poisson, & Zero-Inflated Negative-Binomial
+#' @param loomfile Expression quantity file (loom format).
+#' @param num_chunks Number of chunks.
+#' @param outdir Name of the folder where results should be stored.
+#' @param dryrun TRUE if you only want to check the job submission commands.
+#' @param scriptfile PBS job submission script
+#' @param rfile R script to execute
+#' @param layer Layer name of the count to use in the loom file.
+#' @param g_start Starting gene index to analyze.
+#' @param g_end Ending gene index to analyze.
+#' @param chunk_start Starting chunk index to submit.
+#' @param chunk_end Ending chunk index to submit.
+#' @return ... None is returned.
 #'
 submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile, layer=NULL, g_start=NULL, g_end=NULL, chunk_start=NULL, chunk_end=NULL) {
   nCores <- min(4, parallel::detectCores())

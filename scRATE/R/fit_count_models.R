@@ -5,10 +5,15 @@
 #' @param exposure Numeric vector of cell sizes (total UMI counts per cell).
 #' @param nCores Number of cores.
 #' @param seed Seed number.
-#' @param ... Arguments passed to `rstan::sampling` (e.g. iter, chains).
 #' @return A list of `stanfit` returned by four models: Poisson, Negative-Binomial, Zero-Inflated Poisson, & Zero-Inflated Negative-Binomial
 #'
-fit_count_models <- function(y, exposure, nCores, seed) {
+fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL) {
+  if(is.null(nCores)) {
+    nCores <- parallel::detectCores()
+  }
+  if(is.null(seed)) {
+    seed <- 1004
+  }
 
   gexpr <- data.frame(y, exposure)
 
