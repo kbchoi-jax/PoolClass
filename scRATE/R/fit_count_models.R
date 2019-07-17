@@ -8,12 +8,10 @@
 #' @param ... Arguments passed to `rstan::sampling` (e.g. iter, chains).
 #' @return A list of `stanfit` returned by four models: Poisson, Negative-Binomial, Zero-Inflated Poisson, & Zero-Inflated Negative-Binomial
 #'
-
-
 fit_count_models <- function(y, exposure, nCores, seed) {
-  
+
   gexpr <- data.frame(y, exposure)
-  
+
   fit_1 <- stan_glm(y ~ 1,
                     family=poisson,
                     offset=exposure,
@@ -21,7 +19,7 @@ fit_count_models <- function(y, exposure, nCores, seed) {
                     cores = nCores,
                     seed=seed,
                     refresh=0)
-  
+
   fit_2 <- stan_glm(y ~ 1,
                     family=neg_binomial_2,
                     offset=exposure,
@@ -29,7 +27,7 @@ fit_count_models <- function(y, exposure, nCores, seed) {
                     cores = nCores,
                     seed=seed,
                     refresh=0)
-  
+
   myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
                          data = gexpr,
                          family = zero_inflated_poisson())
@@ -45,7 +43,7 @@ fit_count_models <- function(y, exposure, nCores, seed) {
                                      scale=myprior_3_values[3]),
                            cores = nCores,
                            seed=seed)
-  
+
   myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
                          data = gexpr,
                          family = zero_inflated_negbinomial())
@@ -61,7 +59,7 @@ fit_count_models <- function(y, exposure, nCores, seed) {
                                      scale=myprior_4_values[3]),
                            cores = nCores,
                            seed=seed)
-  
+
   return(list("P"=fit_1, "NB"=fit_2, "ZIP"=fit_3, "ZINB"=fit_4))
-  
+
 }
