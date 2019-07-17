@@ -105,7 +105,7 @@ ENV/
 .vscode
 .Rproj.user
 
-# scBMA
+# scRATE
 .Rhistory
-scBMA/.gitignore
-scBMA/packrat/lib*/
+scRATE.Rcheck
+scRATE_*.tar.gz
