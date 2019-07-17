@@ -4,7 +4,7 @@
 \alias{fit_count_models}
 \title{Bayesian linear regression with Stan}
 \usage{
-fit_count_models(y, exposure, nCores, seed)
+fit_count_models(y, exposure, nCores = NULL, seed = NULL)
 }
 \arguments{
 \item{y}{Numeric vector of UMI counts.}
@@ -14,8 +14,6 @@ fit_count_models(y, exposure, nCores, seed)
 \item{nCores}{Number of cores.}
 
 \item{seed}{Seed number.}
-
-\item{...}{Arguments passed to `rstan::sampling` (e.g. iter, chains).}
 }
 \value{
 A list of `stanfit` returned by four models: Poisson, Negative-Binomial, Zero-Inflated Poisson, & Zero-Inflated Negative-Binomial
