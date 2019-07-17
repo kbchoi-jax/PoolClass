@@ -1,4 +1,4 @@
-#' Bayesian linear regression with Stan
+#' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
 #' @param loomfile A expression quantity file (loom format).

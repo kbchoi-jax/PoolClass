@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_model_comparison.R
 \name{run_model_comparison}
 \alias{run_model_comparison}
-\title{Bayesian model selection using loo}
+\title{Bayesian model selection for scRNA-seq count data}
 \usage{
 run_model_comparison(cntfile, nCores = NULL, seed = NULL,
   outfile = NULL)
@@ -20,5 +20,5 @@ run_model_comparison(cntfile, nCores = NULL, seed = NULL,
 A list of ELPD_loo results returned by loo::compare
 }
 \description{
-Bayesian model selection using loo
+Bayesian model selection for scRNA-seq count data
 }

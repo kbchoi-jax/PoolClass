@@ -2,7 +2,7 @@
 % Please edit documentation in R/collate_model_selections.R
 \name{collate_model_selections}
 \alias{collate_model_selections}
-\title{Bayesian linear regression with Stan}
+\title{Bayesian model selection for scRNA-seq count data}
 \usage{
 collate_model_selections(loomfile, loo_results, attr_name)
 }
@@ -17,5 +17,5 @@ collate_model_selections(loomfile, loo_results, attr_name)
 best_model_calls Best model calls are also stored in the input loomfile.
 }
 \description{
-Bayesian linear regression with Stan
+Bayesian model selection for scRNA-seq count data
 }

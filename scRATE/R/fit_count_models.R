@@ -1,4 +1,4 @@
-#' Bayesian linear regression with Stan
+#' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
 #' @param y Numeric vector of UMI counts.

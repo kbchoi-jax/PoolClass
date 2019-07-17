@@ -2,7 +2,7 @@
 % Please edit documentation in R/submit_jobs.R
 \name{submit_jobs}
 \alias{submit_jobs}
-\title{Bayesian linear regression with Stan}
+\title{Bayesian model selection for scRNA-seq count data}
 \usage{
 submit_jobs(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   layer = NULL, g_start = NULL, g_end = NULL, chunk_start = NULL,
@@ -35,5 +35,5 @@ submit_jobs(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
 ... None is returned.
 }
 \description{
-Bayesian linear regression with Stan
+Bayesian model selection for scRNA-seq count data
 }

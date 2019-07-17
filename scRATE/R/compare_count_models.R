@@ -1,8 +1,7 @@
-#' Bayesian linear regression with Stan
+#' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
 #' @param model_fit A list of four model fits.
-#' @param ... Arguments passed to `rstan::sampling` (e.g. iter, chains).
 #' @return loo_results ELPD_loo results.
 #
 compare_count_models <- function(model_fit) {

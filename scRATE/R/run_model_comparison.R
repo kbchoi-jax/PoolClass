@@ -1,4 +1,4 @@
-#' Bayesian model selection using loo
+#' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
 #' @param cntfile Expression quantity file (RData format: Use 'save' and 'load').

@@ -2,18 +2,16 @@
 % Please edit documentation in R/compare_count_models.R
 \name{compare_count_models}
 \alias{compare_count_models}
-\title{Bayesian linear regression with Stan}
+\title{Bayesian model selection for scRNA-seq count data}
 \usage{
 compare_count_models(model_fit)
 }
 \arguments{
 \item{model_fit}{A list of four model fits.}
-
-\item{...}{Arguments passed to `rstan::sampling` (e.g. iter, chains).}
 }
 \value{
 loo_results ELPD_loo results.
 }
 \description{
-Bayesian linear regression with Stan
+Bayesian model selection for scRNA-seq count data
 }

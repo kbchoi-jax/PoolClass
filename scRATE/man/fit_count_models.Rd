@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_count_models.R
 \name{fit_count_models}
 \alias{fit_count_models}
-\title{Bayesian linear regression with Stan}
+\title{Bayesian model selection for scRNA-seq count data}
 \usage{
 fit_count_models(y, exposure, nCores = NULL, seed = NULL)
 }
@@ -19,5 +19,5 @@ fit_count_models(y, exposure, nCores = NULL, seed = NULL)
 A list of `stanfit` returned by four models: Poisson, Negative-Binomial, Zero-Inflated Poisson, & Zero-Inflated Negative-Binomial
 }
 \description{
-Bayesian linear regression with Stan
+Bayesian model selection for scRNA-seq count data
 }

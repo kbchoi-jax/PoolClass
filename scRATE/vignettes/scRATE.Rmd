@@ -17,9 +17,3 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(scRATE)
 ```
-
-```r
-# Call function 'hello'
-hello()
-## [1] "Hello, world!"
-```
