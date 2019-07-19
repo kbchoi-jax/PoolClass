@@ -4,7 +4,8 @@
 \alias{fit_count_models}
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
-fit_count_models(y, exposure, nCores = NULL, seed = NULL)
+fit_count_models(y, exposure, nCores = NULL, seed = NULL,
+  brms4zi = FALSE)
 }
 \arguments{
 \item{y}{Numeric vector of UMI counts.}

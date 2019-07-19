@@ -4,10 +4,12 @@
 \alias{select_model}
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
-select_model(loo_results)
+select_model(loo_results, margin = 2)
 }
 \arguments{
 \item{loo_results}{ELPD_loo for models.}
+
+\item{margin}{A multiplier for confidence interval}
 }
 \value{
 selected_model Reports the model scRATE selects (1:P, 2:NB, 3:ZIP, 4:ZINB).
