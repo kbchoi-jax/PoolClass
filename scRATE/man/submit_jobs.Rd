@@ -5,8 +5,8 @@
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
 submit_jobs(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
-  layer = NULL, g_start = NULL, g_end = NULL, chunk_start = NULL,
-  chunk_end = NULL)
+  layer = NULL, nCores = NULL, seed = NULL, g_start = NULL,
+  g_end = NULL, chunk_start = NULL, chunk_end = NULL)
 }
 \arguments{
 \item{loomfile}{Expression quantity file (loom format).}
@@ -22,6 +22,10 @@ submit_jobs(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
 \item{rfile}{R script to execute}
 
 \item{layer}{Layer name of the count to use in the loom file.}
+
+\item{nCores}{Number of cores to run stan fitting in parallel}
+
+\item{seed}{Seed number to reproduce randomized results}
 
 \item{g_start}{Starting gene index to analyze.}
 

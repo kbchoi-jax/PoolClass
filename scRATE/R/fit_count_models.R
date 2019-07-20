@@ -9,7 +9,7 @@
 #'
 fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, brms4zi=FALSE) {
   if(is.null(nCores)) {
-    nCores <- parallel::detectCores()
+    nCores <- min(4, parallel::detectCores())
   }
   if(is.null(seed)) {
     seed <- 1004
@@ -18,20 +18,20 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, brms4zi=FALSE)
   gexpr <- data.frame(y, exposure)
 
   fit_1 <- stan_glm(y ~ 1,
-                    family=poisson,
-                    offset=exposure,
-                    data=gexpr,
+                    family = poisson,
+                    offset = exposure,
+                    data = gexpr,
                     cores = nCores,
-                    seed=seed,
-                    refresh=0)
+                    seed = seed,
+                    refresh = 0)
 
   fit_2 <- stan_glm(y ~ 1,
-                    family=neg_binomial_2,
-                    offset=exposure,
-                    data=gexpr,
+                    family = neg_binomial_2,
+                    offset = exposure,
+                    data = gexpr,
                     cores = nCores,
-                    seed=seed,
-                    refresh=0)
+                    seed = seed,
+                    refresh = 0)
 
   myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
                          data = gexpr,
@@ -44,19 +44,19 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, brms4zi=FALSE)
                  prior = myprior_3,
                  cores = nCores,
                  seed = seed,
-                 refresh=500)
+                 refresh = 500)
   } else {
     fit_3 <- rstan::sampling(stanmodels$zip,
-                            data=list(N=length(y),
-                                      Y=y,
-                                      offset=exposure,
-                                      offset_zi=exposure,
-                                      prior_only=0,
-                                      df=myprior_3_values[1],
-                                      loc=myprior_3_values[2],
-                                      scale=myprior_3_values[3]),
+                            data=list(N = length(y),
+                                      Y = y,
+                                      offset = exposure,
+                                      offset_zi = exposure,
+                                      prior_only = 0,
+                                      df = myprior_3_values[1],
+                                      loc = myprior_3_values[2],
+                                      scale = myprior_3_values[3]),
                             cores = nCores,
-                            seed=seed)
+                            seed = seed)
   }
 
   myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
@@ -70,19 +70,19 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, brms4zi=FALSE)
                  prior = myprior_4,
                  cores = nCores,
                  seed = seed,
-                 refresh=500)
+                 refresh = 500)
   } else {
     fit_4 <- rstan::sampling(stanmodels$zinb,
-                            data=list(N=length(y),
-                                      Y=y,
-                                      offset=exposure,
-                                      offset_zi=exposure,
-                                      prior_only=0,
-                                      df=myprior_4_values[1],
-                                      loc=myprior_4_values[2],
-                                      scale=myprior_4_values[3]),
+                            data=list(N = length(y),
+                                      Y = y,
+                                      offset = exposure,
+                                      offset_zi = exposure,
+                                      prior_only = 0,
+                                      df = myprior_4_values[1],
+                                      loc = myprior_4_values[2],
+                                      scale = myprior_4_values[3]),
                             cores = nCores,
-                            seed=seed)
+                            seed = seed)
   }
 
   return(list("P"=fit_1, "NB"=fit_2, "ZIP"=fit_3, "ZINB"=fit_4))

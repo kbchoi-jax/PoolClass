@@ -8,14 +8,24 @@
 #' @param scriptfile PBS job submission script
 #' @param rfile R script to execute
 #' @param layer Layer name of the count to use in the loom file.
+#' @param nCores Number of cores to run stan fitting in parallel
+#' @param seed Seed number to reproduce randomized results
 #' @param g_start Starting gene index to analyze.
 #' @param g_end Ending gene index to analyze.
 #' @param chunk_start Starting chunk index to submit.
 #' @param chunk_end Ending chunk index to submit.
 #' @return ... None is returned.
 #'
-submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile, layer=NULL, g_start=NULL, g_end=NULL, chunk_start=NULL, chunk_end=NULL) {
-  nCores <- min(4, parallel::detectCores())
+submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile, 
+                        layer=NULL, nCores=NULL, seed=NULL, 
+                        g_start=NULL, g_end=NULL, chunk_start=NULL, chunk_end=NULL) {
+  if(is.null(nCores)) {
+    nCores <- min(4, parallel::detectCores())
+  }
+  if(is.null(seed)) {
+    seed <- 1004
+  }
+
   ds <- connect(loomfile, mode = 'r+')
   if(is.null(layer)) {
     dmat <- ds$matrix[,]
@@ -96,7 +106,8 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     gsurv  <- selected[s:e]
     ifile <- sprintf('%s/_chunk.%05d-%05d.rds', outdir, s, e)
     ofile <- sprintf('%s/_poolclass_compare_models.%05d-%05d.rds', outdir, s, e)
-    cmdstr <- sprintf('qsub -o %s -e %s -v RFILE=%s,INFILE=%s,OUTFILE=%s %s', outdir, outdir, rfile, ifile, ofile, scriptfile)
+    cmdstr <- sprintf('qsub -o %s -e %s -v RFILE=%s,INFILE=%s,OUTFILE=%s,CORES=%d,SEED=%d %s', 
+                      outdir, outdir, rfile, ifile, ofile, nCores, seed, scriptfile)
     if(!dryrun) {
       save(cntmat, gsurv, csize, file = ifile)
       cat(cmdstr, '\n')
