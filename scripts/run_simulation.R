@@ -30,7 +30,7 @@ for (gg in c(1:num_genes)) {
       yrep2 <- posterior_predict(model_fit$NB)
       yrep3 <- posterior_predict(model_fit$ZIP)
       yrep4 <- posterior_predict(model_fit$ZINB)
-      num_posterior_samp <- dim(yrep_1)[1]
+      num_posterior_samp <- dim(yrep1)[1]
       sim1 <- yrep1[sample(num_posterior_samp, 1),]
       sim2 <- yrep2[sample(num_posterior_samp, 1),]
       sim3 <- yrep3[sample(num_posterior_samp, 1),]
