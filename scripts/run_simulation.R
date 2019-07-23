@@ -25,30 +25,14 @@ for (gg in c(1:num_genes)) {
     tryCatch({
       model_fit <- fit_count_models(y, exposure, nCores, seed, brms4zi = TRUE)
       elpd_loo <- compare_count_models(model_fit)
-      # Generate simulated counts for each model
-      yrep1 <- posterior_predict(model_fit$P)
-      yrep2 <- posterior_predict(model_fit$NB)
-      yrep3 <- posterior_predict(model_fit$ZIP)
-      yrep4 <- posterior_predict(model_fit$ZINB)
-      num_posterior_samp <- dim(yrep1)[1]
-      sim1 <- yrep1[sample(num_posterior_samp, 1),]
-      sim2 <- yrep2[sample(num_posterior_samp, 1),]
-      sim3 <- yrep3[sample(num_posterior_samp, 1),]
-      sim4 <- yrep4[sample(num_posterior_samp, 1),]
-      # Fit simulated counts with all four models
-      model_fit_sim1 <- fit_count_models(sim1, exposure, nCores, seed)
-      model_fit_sim2 <- fit_count_models(sim2, exposure, nCores, seed)
-      model_fit_sim3 <- fit_count_models(sim3, exposure, nCores, seed)
-      model_fit_sim4 <- fit_count_models(sim4, exposure, nCores, seed)
-      elpd_loo_sim1 <- compare_count_models(model_fit_sim1)
-      elpd_loo_sim2 <- compare_count_models(model_fit_sim2)
-      elpd_loo_sim3 <- compare_count_models(model_fit_sim3)
-      elpd_loo_sim4 <- compare_count_models(model_fit_sim4)
-      res <- list(orig=elpd_loo,
-                  sim1=elpd_loo_sim1,
-                  sim2=elpd_loo_sim2,
-                  sim3=elpd_loo_sim3,
-                  sim4=elpd_loo_sim4)
+      res <- list(orig=elpd_loo)
+      for (m in 1:4) {
+        # Generate simulated counts for each model
+        ysim <- as.numeric(posterior_predict(model_fit[[m]], draws = 1))
+        # Fit simulated counts with all four models
+        model_fit_ysim <- fit_count_models(ysim, exposure, nCores, seed)
+        res[[paste('sim', m, sep = '')]] <- compare_count_models(model_fit_ysim)
+      }
       results[[gname[gg]]] <- res
     }, error = function(err) {
       cat(sprintf("Error while fitting %s\n", gname[gg]))
