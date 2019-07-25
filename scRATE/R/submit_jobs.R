@@ -10,15 +10,15 @@
 #' @param layer Layer name of the count to use in the loom file.
 #' @param nCores Number of cores to run stan fitting in parallel
 #' @param seed Seed number to reproduce randomized results
-#' @param g_start Starting gene index to analyze.
-#' @param g_end Ending gene index to analyze.
+#' @param gene_start Starting gene index to analyze.
+#' @param gene_end Ending gene index to analyze.
 #' @param chunk_start Starting chunk index to submit.
 #' @param chunk_end Ending chunk index to submit.
 #' @return ... None is returned.
 #'
 submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile, 
                         layer=NULL, nCores=NULL, seed=NULL, 
-                        g_start=NULL, g_end=NULL, chunk_start=NULL, chunk_end=NULL) {
+                        gene_start=NULL, gene_end=NULL, chunk_start=NULL, chunk_end=NULL) {
   if(is.null(nCores)) {
     nCores <- min(4, parallel::detectCores())
   }
@@ -44,15 +44,15 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   }
   ds$close_all()
 
-  if(is.null(g_start)) {
+  if(is.null(gene_start)) {
     gidx1 <- 1
   } else {
-    gidx1 <- g_start
+    gidx1 <- gene_start
   }
-  if(is.null(g_end)) {
+  if(is.null(gene_end)) {
     gidx2 <- num_genes
   } else {
-    gidx2 <- g_end
+    gidx2 <- gene_end
   }
 
   idx_gsurv <- which(selected > 0)
@@ -60,19 +60,13 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   num_gsurv <- length(idx_gsurv)
   cat(sprintf('[submit_jobs] %d genes (between Gene %d and %d) will be processed.\n', num_gsurv, gidx1, gidx2))
 
-  # chunk_sz <- ceiling(num_gsurv / num_chunks)
-  # gsets <- split(idx_gsurv, ceiling(seq_along(idx_gsurv) / chunk_sz))
-  # g_ends <- c()
-  # for (k in 1:length(gsets)) {
-  #   g_ends <- c(g_ends, tail(gsets[[k]], 1))
-  # }
   chunk_sz <- num_gsurv / num_chunks
   chunk_end_idx <- round(chunk_sz * 1:num_chunks)
-  g_ends <- idx_gsurv[chunk_end_idx]
-  g_starts <- g_ends + 1
-  g_starts <- c(gidx1, g_starts)
-  g_starts <- g_starts[-length(g_starts)]
-  g_ends[length(g_ends)] <- gidx2
+  gene_ends <- idx_gsurv[chunk_end_idx]
+  gene_starts <- gene_ends + 1
+  gene_starts <- c(gidx1, gene_starts)
+  gene_starts <- gene_starts[-length(gene_starts)]
+  gene_ends[length(gene_ends)] <- gidx2
 
   dmat <- as.data.frame(t(dmat))
   rownames(dmat) <- gname
@@ -91,14 +85,14 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     if (chunk_end > num_chunks) {
       cidx2 <- num_chunks
       cat(sprintf("[submit_jobs] There are %d chunks only, but you requested more up to %d. The last chunk index is modified accordingly",
-                  num_chunks, chunk_end), call. = FALSE)
+                  num_chunks, chunk_end))
     }
   }
   cat(sprintf('[submit_jobs] Chunk %d to %d (out of %d) will be processed.\n', cidx1, cidx2, num_chunks))
 
   for (k in cidx1:cidx2) {
-    s <- g_starts[k]
-    e <- g_ends[k]
+    s <- gene_starts[k]
+    e <- gene_ends[k]
     cntmat <- dmat[s:e,]
     gsurv  <- selected[s:e]
     ifile <- sprintf('%s/_chunk.%05d-%05d.rds', outdir, s, e)
