@@ -7,7 +7,7 @@ if (length(args)!=2) {
 indir <- args[1]
 outfile <- args[2]
 
-flist <- Sys.glob(sprintf('%s/_poolclass*', indir))
+flist <- Sys.glob(sprintf('%s/_scrate*', indir))
 flist <- sort(flist, decreasing = FALSE)
 results <- list()
 for (k in 1:length(flist)) {

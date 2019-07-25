@@ -81,7 +81,7 @@ for (k in cidx1:cidx2) {
   cntmat <- dmat[s:e,]
   gsurv  <- selected[s:e]
   ifile <- sprintf('%s/_chunk.%05d-%05d.rds', outdir, s, e)
-  ofile <- sprintf('%s/_poolclass_compare_models.%05d-%05d.rds', outdir, s, e)
+  ofile <- sprintf('%s/_scrate_compare_models.%05d-%05d.rds', outdir, s, e)
   cmdstr <- sprintf('qsub -o %s -e %s -v RFILE=%s,INFILE=%s,OUTFILE=%s %s', outdir, outdir, rfile, ifile, ofile, scriptfile)
   if(!dryrun) {
     save(cntmat, gsurv, csize, file = ifile)

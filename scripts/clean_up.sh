@@ -18,6 +18,6 @@ echo "Removing temporary data files..."
 rm ${WORKDIR}/_chunk.*
 
 echo "Removing temporary result files..."
-rm ${WORKDIR}/_poolclass_compare_models.*
+rm ${WORKDIR}/_scrate_compare_models.*
 
 echo "Done."
