@@ -73,7 +73,7 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   g_starts <- c(gidx1, g_starts)
   g_starts <- g_starts[-length(g_starts)]
   g_ends[length(g_ends)] <- gidx2
-  
+
   dmat <- as.data.frame(t(dmat))
   rownames(dmat) <- gname
   colnames(dmat) <- cname
@@ -85,15 +85,14 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     cidx1 <- chunk_start
   }
   if (is.null(chunk_end)) {
-    cidx2 <- length(gsets)
-    if (num_chunks != cidx2) {
-      stop(sprintf("The computed number of chunks %d is not equal to the requested number %d.", num_chunks, cidx2), call. = FALSE)
-    }
+    cidx2 <- num_chunks
   } else {
-    if (chunk_end > num_chunks) {
-      stop(sprintf("The computed number of chunks %d is not equal to the requested number %d.", num_chunks, chunk_end), call. = FALSE)
-    }
     cidx2 <- chunk_end
+    if (chunk_end > num_chunks) {
+      cidx2 <- num_chunks
+      cat(sprintf("[submit_jobs] There are %d chunks only, but you requested more up to %d. The last chunk index is modified accordingly",
+                  num_chunks, chunk_end), call. = FALSE)
+    }
   }
   cat(sprintf('[submit_jobs] Chunk %d to %d (out of %d) will be processed.\n', cidx1, cidx2, num_chunks))
 
