@@ -84,7 +84,7 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     cidx2 <- chunk_end
     if (chunk_end > num_chunks) {
       cidx2 <- num_chunks
-      cat(sprintf("[submit_jobs] There are %d chunks only, but you requested more up to %d. The last chunk index is modified accordingly",
+      cat(sprintf("[submit_jobs] There are %d chunks only, but you requested more up to %d. The last chunk index is modified accordingly.\n",
                   num_chunks, chunk_end))
     }
   }
