@@ -22,8 +22,8 @@ for (gg in c(1:num_genes)) {
     y <- round(unlist(cntmat[gg,]))
     cat(sprintf("\nTesting %s\n", gname[gg]))
     tryCatch({
-      res <- compare_count_models(y, exposure, nCores, seed)
-      results[[gname[gg]]] <- res
+      model_fit <- fit_count_models(y, exposure, nCores, seed)
+      results[[gname[gg]]] <- compare_count_models(model_fit)
     }, error = function(err) {
       cat(sprintf("Error while fitting %s\n", gname[gg]))
     })
