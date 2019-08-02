@@ -2,12 +2,19 @@
 #'
 #' @export
 #' @param loomfile A expression quantity file (loom format).
-#' @param loo_results Leave-one-out ELPD result file.
+#' @param loo_dir A folder name in which leave-one-out ELPD result files reside.
 #' @param attr_name Name of the row attribute in loomfile for storing best model calls.
+#' @param loo_outfile Name of the file to save collated leave-one-out ELPD results (optional).
 #' @return best_model_calls Best model calls are also stored in the input loomfile.
 #'
-collate_model_selections <- function(loomfile, loo_results, attr_name) {
-  results <- readRDS(loo_results)
+collate_model_selections <- function(loomfile, loo_dir, attr_name, loo_outfile=NULL) {
+  flist <- Sys.glob(file.path(loo_dir, '_scrate*'))
+  flist <- sort(flist, decreasing = FALSE)
+  results <- c()
+  for (i in 1:length(flist)) {
+    results <- c(results, readRDS(flist[i]))
+  }
+  # results <- readRDS(loo_results)
   gsurv <- names(results)
 
   bestmodel <- c()
@@ -40,6 +47,9 @@ collate_model_selections <- function(loomfile, loo_results, attr_name) {
         bestmodel <- c(bestmodel, 4)
       }
     }
+  }
+  if (!is.null(loo_outfile)) {
+    saveRDS(results, file=loo_outfile)
   }
   cat(sprintf('%5d Poisson genes\n', sum(bestmodel==1)))
   cat(sprintf('%5d Negative Binomial genes\n', sum(bestmodel==2)))

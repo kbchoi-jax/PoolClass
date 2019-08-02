@@ -4,14 +4,17 @@
 \alias{collate_model_selections}
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
-collate_model_selections(loomfile, loo_results, attr_name)
+collate_model_selections(loomfile, loo_dir, attr_name,
+  loo_outfile = NULL)
 }
 \arguments{
 \item{loomfile}{A expression quantity file (loom format).}
 
-\item{loo_results}{Leave-one-out ELPD result file.}
+\item{loo_dir}{A folder name in which leave-one-out ELPD result files reside.}
 
 \item{attr_name}{Name of the row attribute in loomfile for storing best model calls.}
+
+\item{loo_outfile}{Name of the file to save collated leave-one-out ELPD results (optional).}
 }
 \value{
 best_model_calls Best model calls are also stored in the input loomfile.
