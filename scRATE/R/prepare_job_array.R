@@ -5,8 +5,6 @@
 #' @param num_chunks Number of chunks.
 #' @param outdir Name of the folder where results should be stored.
 #' @param dryrun TRUE if you only want to check the job submission commands.
-#' @param scriptfile PBS job submission script
-#' @param rfile R script to execute
 #' @param layer Layer name of the count to use in the loom file.
 #' @param nCores Number of cores to run stan fitting in parallel
 #' @param seed Seed number to reproduce randomized results
@@ -16,9 +14,9 @@
 #' @param chunk_end Ending chunk index to submit.
 #' @return ... None is returned.
 #'
-submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile, 
-                        layer=NULL, nCores=NULL, seed=NULL, 
-                        gene_start=NULL, gene_end=NULL, chunk_start=NULL, chunk_end=NULL) {
+prepare_job_array <- function(loomfile, num_chunks, outdir, dryrun,
+                              layer=NULL, nCores=NULL, seed=NULL, 
+                              gene_start=NULL, gene_end=NULL, chunk_start=NULL, chunk_end=NULL) {
   if(is.null(nCores)) {
     nCores <- min(4, parallel::detectCores())
   }
@@ -29,10 +27,10 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   ds <- connect(loomfile, mode = 'r+')
   if(is.null(layer)) {
     dmat <- ds$matrix[,]
-    cat('[submit_jobs] Counts from main layer will be loaded.\n')
+    cat('[prepare_job_array] Counts from main layer will be loaded.\n')
   } else {
     dmat <- ds$layers[[layer]][,]
-    cat(sprintf('[submit_jobs] Counts from %s layer will be loaded.\n', layer))
+    cat(sprintf('[prepare_job_array] Counts from %s layer will be loaded.\n', layer))
   }
   num_cells <- dim(dmat)[1]
   num_genes <- dim(dmat)[2]
@@ -58,7 +56,7 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   idx_gsurv <- which(selected > 0)
   idx_gsurv <- idx_gsurv[idx_gsurv >= gidx1 & idx_gsurv <= gidx2]
   num_gsurv <- length(idx_gsurv)
-  cat(sprintf('[submit_jobs] %d genes (between Gene %d and %d) will be processed.\n', num_gsurv, gidx1, gidx2))
+  cat(sprintf('[prepare_job_array] %d genes (between Gene %d and %d) will be processed.\n', num_gsurv, gidx1, gidx2))
 
   chunk_sz <- num_gsurv / num_chunks
   chunk_end_idx <- round(chunk_sz * 1:num_chunks)
@@ -84,28 +82,39 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     cidx2 <- chunk_end
     if (chunk_end > num_chunks) {
       cidx2 <- num_chunks
-      cat(sprintf("[submit_jobs] There are %d chunks only, but you requested more up to %d. The last chunk index is modified accordingly.\n",
+      cat(sprintf("[prepare_job_array] There are %d chunks only, but you requested more up to %d. The last chunk index is modified accordingly.\n",
                   num_chunks, chunk_end))
     }
   }
-  cat(sprintf('[submit_jobs] Chunk %d to %d (out of %d) will be processed.\n', cidx1, cidx2, num_chunks))
+  cat(sprintf('[prepare_job_array] Chunk %d to %d (out of %d) will be processed.\n', cidx1, cidx2, num_chunks))
 
-  for (k in cidx1:cidx2) {
-    s <- gene_starts[k]
-    e <- gene_ends[k]
-    cntmat <- dmat[s:e,]
-    gsurv  <- selected[s:e]
-    ifile <- sprintf('%s/_chunk.%05d-%05d.rds', outdir, s, e)
-    ofile <- sprintf('%s/_scrate_elpd_loo.%05d-%05d.rds', outdir, s, e)
-    cmdstr <- sprintf('qsub -o %s -e %s -v RFILE=%s,INFILE=%s,OUTFILE=%s,CORES=%d,SEED=%d %s', 
-                      outdir, outdir, rfile, ifile, ofile, nCores, seed, scriptfile)
-    if(!dryrun) {
-      save(cntmat, gsurv, csize, file = ifile)
-      cat(cmdstr, '\n')
-      system(cmdstr)
-      Sys.sleep(1)
-    } else {
-      cat(cmdstr, '\n')
+  if(!dryrun) {
+    for (k in cidx1:cidx2) {
+      s <- gene_starts[k]
+      e <- gene_ends[k]
+      cntmat <- dmat[s:e,]
+      gsurv  <- selected[s:e]
+      outfile <- file.path(outdir, sprintf('_chunk.%05d', k))
+      save(cntmat, gsurv, csize, file = outfile)
+      cat(sprintf("[prepare_job_array] Created input file: %s\n", outfile))
+    }
+    sh_file <- file.path(outdir, 'run_subjobs.sh')
+    cat('#!/bin/bash\n', file=sh_file)
+    cat('#PBS -l nodes=1:ppn=4,mem=16gb,walltime=23:59:59\n\n', file=sh_file, append=TRUE)
+    cat('cd $PBS_O_WORKDIR\n\n', file=sh_file, append=TRUE)
+    cat('# Add environment modules here, for example ...\n', file=sh_file, append=TRUE)
+    cat('module load hdf5/1.8.14\n', file=sh_file, append=TRUE)
+    cat('module load R/3.5.1\n\n', file=sh_file, append=TRUE)
+    cat('# Run R script\n', file=sh_file, append=TRUE)
+    cat('CASE_ID=`printf %05d $PBS_ARRAYID`\n', file=sh_file, append=TRUE)
+    cat('Rscript ${RFILE} _chunk.${CASE_ID} _scrate_elpd_loo.${CASE_ID} ${CORES} ${SEED}\n', file=sh_file, append=TRUE)
+    Sys.chmod(sh_file, '0755')
+    cat(sprintf("[prepare_job_array] Generated bash script, %s, for submitting array jobs. Modify the file if needed.\n", sh_file))
+  } else {
+    for (k in cidx1:cidx2) {
+      outfile <- file.path(outdir, sprintf('_chunk.%05d', k))
+      cat(sprintf("[prepare_job_array::dryrun] Will created input file: %s\n", outfile))
     }
   }
 }
+   
