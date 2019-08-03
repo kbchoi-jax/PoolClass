@@ -60,7 +60,11 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   num_gsurv <- length(idx_gsurv)
   cat(sprintf('[submit_jobs] %d genes (between Gene %d and %d) will be processed.\n', num_gsurv, gidx1, gidx2))
 
-  chunk_sz <- num_gsurv / num_chunks
+  if(num_chunks >= num_gsurv) {
+    chunk_sz <- 1
+  } else {
+    chunk_sz <- num_gsurv / num_chunks
+  }
   chunk_end_idx <- round(chunk_sz * 1:num_chunks)
   gene_ends <- idx_gsurv[chunk_end_idx]
   gene_starts <- gene_ends + 1

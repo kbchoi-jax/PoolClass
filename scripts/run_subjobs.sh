@@ -8,4 +8,5 @@ module load hdf5/1.8.14
 module load R/3.5.1
 
 # Run R script
-Rscript ${RFILE} ${INFILE} ${OUTFILE} ${CORES} ${SEED}
+CASE_ID=`printf %05d $PBS_ARRAYID`
+Rscript ${RFILE} _chunk.${CASE_ID} _scrate_elpd_loo.${CASE_ID} ${CORES} ${SEED}
