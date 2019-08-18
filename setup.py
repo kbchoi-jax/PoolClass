@@ -53,11 +53,10 @@ setup(
         'scripts/compare_count_models.R',
         'scripts/run_model_comparison.R',
         'scripts/submit_jobs.R',
-        'scripts/submit_jobs.gene_range.R',
-        'scripts/submit_jobs.chunk_range.R',
         'scripts/write.model_selections.R',
         'scripts/collate_results.R',
-        'scripts/clean_up.sh'
+        'scripts/clean_up.sh',
+        'scripts/run_subjobs.sh'
     ],
     setup_requires=setup_requirements,
     test_suite='tests',
