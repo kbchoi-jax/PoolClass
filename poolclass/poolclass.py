@@ -155,6 +155,57 @@ def __em4tge_dense(cntmat, scaler, percentile, tol, max_iters):
     return lamb, mu, phi, err
 
 
+def __em4tge_dense_weighted(cntmat, weight, exposure, percentile, tol, max_iters):
+    #
+    # Initial mu and phi
+    #
+    cntmat_scaled = cntmat / exposure
+    w = weight / sum(weight)
+    mean_x_scaled = np.average(cntmat_scaled, axis=1, weights=w)
+    var_x_scaled = cntmat_scaled.var(axis=1)
+    phi = var_x_scaled / mean_x_scaled - 1
+    phi[phi < 0] = 0.001
+    mu = mean_x_scaled / phi
+    phi = np.squeeze(np.asarray(phi))
+    mu = np.squeeze(np.asarray(mu))
+
+    for cur_iter in range(max_iters):
+        #
+        # Initialize an iteration
+        #
+        mu_prev = mu.copy()
+
+        #
+        # E-step
+        #
+        p = (1 / (np.outer(exposure, phi) + 1) * phi).T
+        x_plus_mu = np.add(cntmat, mu[:, np.newaxis])
+        lamb = np.multiply(x_plus_mu, p)
+        mean_lamb = lamb.mean(axis=1)
+        log_lamb = digamma(x_plus_mu) + np.log(p)
+        suff = np.log(mean_lamb) - log_lamb.mean(axis=1)
+
+        #
+        # M-step
+        #
+        mu = __update_shape(np.squeeze(np.asarray(suff)), tol, max_iters)
+        phi = np.divide(np.squeeze(np.asarray(mean_lamb)), mu)
+
+        #
+        # Check termination
+        #
+        err = np.abs(mu - mu_prev)
+        err_pct = np.percentile(err, percentile)
+        num_converged = sum(err < tol)
+        if err_pct < tol:
+            break
+        LOG.warn('Iter #%04d: %6s genes converged below the tolerance level of %.1E' % (cur_iter+1, num_converged, tol))
+        LOG.debug('Median error=%.6f' % err_pct)
+    if cur_iter+1 == max_iters:
+        LOG.warn('Reached the maximum number of iterations')
+    return lamb, mu, phi, err
+
+
 def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
     if model == 'normalizing' and model == 'pooling':
         raise RuntimeError('The model should be either \"normalizing\" or \"pooling\".')
