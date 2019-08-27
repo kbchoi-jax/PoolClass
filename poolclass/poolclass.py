@@ -115,8 +115,8 @@ def __em4tge_dense(cntmat, scaler, percentile, tol, max_iters):
     phi = var_x_scaled / mean_x_scaled - 1
     phi[phi < 0] = 0.001
     mu = mean_x_scaled / phi
-    phi = np.squeeze(np.asarray(phi))
-    mu = np.squeeze(np.asarray(mu))
+    # phi = np.squeeze(np.asarray(phi))
+    # mu = np.squeeze(np.asarray(mu))
 
     for cur_iter in range(max_iters):
         #
@@ -137,8 +137,10 @@ def __em4tge_dense(cntmat, scaler, percentile, tol, max_iters):
         #
         # M-step
         #
-        mu = __update_shape(np.squeeze(np.asarray(suff)), tol, max_iters)
-        phi = np.divide(np.squeeze(np.asarray(mean_lamb)), mu)
+        # mu = __update_shape(np.squeeze(np.asarray(suff)), tol, max_iters)
+        # phi = np.divide(np.squeeze(np.asarray(mean_lamb)), mu)
+        mu = __update_shape(suff, tol, max_iters)
+        phi = np.divide(mean_lamb, mu)
 
         #
         # Check termination
@@ -159,15 +161,13 @@ def __em4tge_dense_weighted(cntmat, weight, exposure, percentile, tol, max_iters
     #
     # Initial mu and phi
     #
-    cntmat_scaled = cntmat / exposure
     w = weight / sum(weight)
+    cntmat_scaled = cntmat / exposure
     mean_x_scaled = np.average(cntmat_scaled, axis=1, weights=w)
-    var_x_scaled = cntmat_scaled.var(axis=1)
+    var_x_scaled = np.average(np.power(cntmat_scaled - mean_x_scaled[:, np.newaxis], 2), axis=1, weights=w)
     phi = var_x_scaled / mean_x_scaled - 1
     phi[phi < 0] = 0.001
     mu = mean_x_scaled / phi
-    phi = np.squeeze(np.asarray(phi))
-    mu = np.squeeze(np.asarray(mu))
 
     for cur_iter in range(max_iters):
         #
@@ -181,15 +181,15 @@ def __em4tge_dense_weighted(cntmat, weight, exposure, percentile, tol, max_iters
         p = (1 / (np.outer(exposure, phi) + 1) * phi).T
         x_plus_mu = np.add(cntmat, mu[:, np.newaxis])
         lamb = np.multiply(x_plus_mu, p)
-        mean_lamb = lamb.mean(axis=1)
+        mean_lamb = np.average(lamb, axis=1, weights=w)
         log_lamb = digamma(x_plus_mu) + np.log(p)
-        suff = np.log(mean_lamb) - log_lamb.mean(axis=1)
+        suff = np.log(mean_lamb) - np.average(log_lamb, axis=1, weights=w)
 
         #
         # M-step
         #
-        mu = __update_shape(np.squeeze(np.asarray(suff)), tol, max_iters)
-        phi = np.divide(np.squeeze(np.asarray(mean_lamb)), mu)
+        mu = __update_shape(suff, tol, max_iters)
+        phi = np.divide(mean_lamb, mu)
 
         #
         # Check termination
