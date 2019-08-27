@@ -275,6 +275,56 @@ def run_em(loomfile, model, common_scale, percentile, tol, max_iters):
     LOG.info("Finished EM for TGE")
 
 
+def quantify(loomfile, common_scale, percentile, tol, max_iters):
+    with loompy.connect(loomfile) as ds:
+        num_genes, num_cells = ds.shape
+        LOG.info('Loading data from %s' % loomfile)
+        origmat = ds.layers[''][:, :]
+        LOG.info('Processing data matrix')
+        if 'Selected' in ds.ca.keys():  # Get selected cells
+            csurv = np.where(ds.ca.Selected > 0)[0]
+            cntmat = origmat[:, csurv]
+        else:
+            csurv = np.arange(num_cells)
+            cntmat = origmat
+        LOG.info('The number of selected cells: %d' % len(csurv))
+        
+        libsz = np.squeeze(np.asarray(cntmat.sum(axis=0)))
+        scaler = libsz / common_scale
+        if 'Selected' in ds.ra.keys():  # Get selected genes
+            gsurv1 = ds.ra.Selected > 0
+        else:
+            gsurv1 = np.ones(num_genes)
+        gsurv2 = np.squeeze(np.asarray((cntmat > 0).sum(axis=1) > 0))
+        gsurv = np.where(np.logical_and(gsurv1, gsurv2))[0]
+        LOG.info('The number of selected genes: %d' % len(gsurv))
+        cntmat = cntmat[gsurv, :]
+
+        # Run EM for all the clusters (TODO: Implement with for loop?)
+        LOG.info('Running EM algorithm for TGE')
+        lambda_mat, mu, phi, err = __em4tge_dense_weighted(cntmat, scaler, percentile, tol, max_iters)
+        LOG.info('There were %d genes that converged below the tolerance level of %.1E' % (sum(err < tol), tol))
+        LOG.info('Saving results to %s' % loomfile)
+        resmat = np.zeros(origmat.shape)
+        resmat[gsurv, :][:, csurv] = lambda_mat
+
+        # Save results
+        ds.layers['lambda'] = resmat
+        mu_res = dok_matrix((num_genes, 1), float)
+        mu_res[gsurv] = mu[:, np.newaxis]
+        ds.ra['mu'] = mu_res
+        phi_res = dok_matrix((num_genes, 1), float)
+        phi_res[gsurv] = phi[:, np.newaxis]
+        ds.ra['phi'] = phi_res
+        err_res = dok_matrix((num_genes, 1), float)
+        err_res[gsurv] = err[:, np.newaxis]
+        ds.ra['err'] = err_res
+        g_selected = dok_matrix((num_genes, 1), float)
+        g_selected[gsurv] = 1
+        ds.ra['Selected:EM'] = g_selected
+    LOG.info("Finished EM for TGE")
+
+
 def __ez_test(y, X, G=None, offset=None, exposure=None):
     if G is None:
         G = X
