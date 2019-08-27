@@ -302,26 +302,30 @@ def quantify(loomfile, common_scale, percentile, tol, max_iters):
 
         # Run EM for all the clusters (TODO: Implement with for loop?)
         LOG.info('Running EM algorithm for TGE')
-        lambda_mat, mu, phi, err = __em4tge_dense_weighted(cntmat, scaler, percentile, tol, max_iters)
-        LOG.info('There were %d genes that converged below the tolerance level of %.1E' % (sum(err < tol), tol))
-        LOG.info('Saving results to %s' % loomfile)
+        clusters = np.unique(ds.ca.CellType[csurv])
         resmat = np.zeros(origmat.shape)
-        resmat[gsurv, :][:, csurv] = lambda_mat
-
-        # Save results
+        for c in clusters:
+            # Estimate model parameters
+            w = ds.ca[c]
+            lambda_mat, mu, phi, err = __em4tge_dense_weighted(cntmat, w, scaler, percentile, tol, max_iters)
+            LOG.info('There were %d genes that converged below the tolerance level of %.1E' % (sum(err < tol), tol))
+            resmat[gsurv, :][:, csurv] += lambda_mat * w
+            # Save results (TODO: Store for all cell types)
+            LOG.info('Saving estimated parameters of Cluster %s to %s' % (c, loomfile))
+            mu_res = dok_matrix((num_genes, 1), float)
+            mu_res[gsurv] = mu[:, np.newaxis]
+            ds.ra['mu:%s' % c.replace(' ', '_')] = mu_res
+            phi_res = dok_matrix((num_genes, 1), float)
+            phi_res[gsurv] = phi[:, np.newaxis]
+            ds.ra['phi:%s' % c.replace(' ', '_')] = phi_res
+            err_res = dok_matrix((num_genes, 1), float)
+            err_res[gsurv] = err[:, np.newaxis]
+            ds.ra['err:%s' % c.replace(' ', '_')] = err_res
+        LOG.info('Saving estimated rate parameter to %s' % loomfile)
         ds.layers['lambda'] = resmat
-        mu_res = dok_matrix((num_genes, 1), float)
-        mu_res[gsurv] = mu[:, np.newaxis]
-        ds.ra['mu'] = mu_res
-        phi_res = dok_matrix((num_genes, 1), float)
-        phi_res[gsurv] = phi[:, np.newaxis]
-        ds.ra['phi'] = phi_res
-        err_res = dok_matrix((num_genes, 1), float)
-        err_res[gsurv] = err[:, np.newaxis]
-        ds.ra['err'] = err_res
         g_selected = dok_matrix((num_genes, 1), float)
         g_selected[gsurv] = 1
-        ds.ra['Selected:EM'] = g_selected
+        ds.ra['Selected:quantify'] = g_selected
     LOG.info("Finished EM for TGE")
 
 
