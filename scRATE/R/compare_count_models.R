@@ -11,7 +11,8 @@ compare_count_models <- function(model_fit) {
   loo_3 <- loo(model_fit$ZIP)
   loo_4 <- loo(model_fit$ZINB)
 
-  res <- loo_compare(loo_1, loo_2, loo_3, loo_4)
+  #res <- loo_compare(loo_1, loo_2, loo_3, loo_4)
+  res <- loo_compare(loo_1, loo_2, loo_4)
   return(res)
 
 }
