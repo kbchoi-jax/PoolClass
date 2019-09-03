@@ -5,14 +5,10 @@
 #' @return loo_results ELPD_loo results.
 #
 compare_count_models <- function(model_fit) {
-
   loo_1 <- loo(model_fit$P)
   loo_2 <- loo(model_fit$NB)
   loo_3 <- loo(model_fit$ZIP)
   loo_4 <- loo(model_fit$ZINB)
-
-  #res <- loo_compare(loo_1, loo_2, loo_3, loo_4)
-  res <- loo_compare(loo_1, loo_2, loo_4)
+  res <- loo_compare(loo_1, loo_2, loo_3, loo_4)
   return(res)
-
 }
