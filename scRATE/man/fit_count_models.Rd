@@ -5,7 +5,7 @@
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
 fit_count_models(y, exposure, nCores = NULL, seed = NULL,
-  brms4zi = FALSE)
+  model2fit = NULL, brms4zi = FALSE)
 }
 \arguments{
 \item{y}{Numeric vector of UMI counts.}
@@ -15,9 +15,11 @@ fit_count_models(y, exposure, nCores = NULL, seed = NULL,
 \item{nCores}{Number of cores.}
 
 \item{seed}{Seed number.}
+
+\item{model2fit}{A specific model to fit (1:P, 2:NB, 3:ZIP, 4:ZINB, NULL:All)}
 }
 \value{
-A list of `stanfit` returned by four models: Poisson, Negative-Binomial, Zero-Inflated Poisson, & Zero-Inflated Negative-Binomial
+A list of `stanfit` returned by model(s)
 }
 \description{
 Bayesian model selection for scRNA-seq count data
