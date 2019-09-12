@@ -20,7 +20,7 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, model2fit=NULL
   gexpr <- data.frame(y, exposure)
   fitting <- list()
 
-  if(is.null(model2fit) | model2fit==1) {
+  if(is.null(model2fit) || model2fit==1) {
     fitting[["P"]] <- stan_glm(y ~ 1,
                                family = poisson,
                                offset = exposure,
@@ -30,7 +30,7 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, model2fit=NULL
                                refresh = 0)
   }
 
-  if(is.null(model2fit) | model2fit==2) {
+  if(is.null(model2fit) || model2fit==2) {
     fitting[["NB"]] <- stan_glm(y ~ 1,
                                 family = neg_binomial_2,
                                 offset = exposure,
@@ -40,7 +40,7 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, model2fit=NULL
                                 refresh = 0)
   }
 
-  if(is.null(model2fit) | model2fit==3) {
+  if(is.null(model2fit) || model2fit==3) {
     myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
                           data = gexpr,
                           family = zero_inflated_poisson())
@@ -69,7 +69,7 @@ fit_count_models <- function(y, exposure, nCores=NULL, seed=NULL, model2fit=NULL
     fitting[["ZIP"]] <- fit_3
   }
 
-  if(is.null(model2fit) | model2fit==4) {
+  if(is.null(model2fit) || model2fit==4) {
     myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
                           data = gexpr,
                           family = zero_inflated_negbinomial())
