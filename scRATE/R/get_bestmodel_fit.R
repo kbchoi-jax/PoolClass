@@ -29,7 +29,7 @@ get_bestmodel_fit <- function(cntfile, nCores=NULL, seed=NULL, outfile=NULL) {
       tryCatch({
         #results[[gname[gg]]] <- fit_count_models(y, exposure, nCores, seed, model2fit=model2fit[gg], brms4zi=TRUE)
         model_fit <- fit_count_models(y, exposure, nCores, seed, model2fit=4, brms4zi=TRUE)
-        results[[gname[gg]]] <- colMeans(as.matrix(model_fit, pars = c("b_Intercept", "b_zi_Intercept", "shape")))
+        results[[gname[gg]]] <- colMeans(as.matrix(model_fit[['ZINB']], pars = c("b_Intercept", "b_zi_Intercept", "shape")))
       }, error = function(err) {
         cat(sprintf("Error while fitting %s\n", gname[gg]))
       })
