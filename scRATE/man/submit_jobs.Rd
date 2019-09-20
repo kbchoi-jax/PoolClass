@@ -9,34 +9,34 @@ submit_jobs(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
   gene_end = NULL, chunk_start = NULL, chunk_end = NULL)
 }
 \arguments{
-\item{loomfile}{Expression quantity file (loom format).}
+\item{loomfile}{Expression quantity file (loom format)}
 
-\item{num_chunks}{Number of chunks.}
+\item{num_chunks}{Number of chunks}
 
-\item{outdir}{Name of the folder where results should be stored.}
+\item{outdir}{Name of the folder where results should be stored}
 
-\item{dryrun}{TRUE if you only want to check the job submission commands.}
+\item{dryrun}{TRUE if you only want to check the job submission commands}
 
 \item{scriptfile}{PBS job submission script}
 
 \item{rfile}{R script to execute}
 
-\item{layer}{Layer name of the count to use in the loom file.}
+\item{layer}{Layer name of the count to use in the loom file}
 
 \item{nCores}{Number of cores to run stan fitting in parallel}
 
 \item{seed}{Seed number to reproduce randomized results}
 
-\item{gene_start}{Starting gene index to analyze.}
+\item{gene_start}{Starting gene index to analyze}
 
-\item{gene_end}{Ending gene index to analyze.}
+\item{gene_end}{Ending gene index to analyze}
 
-\item{chunk_start}{Starting chunk index to submit.}
+\item{chunk_start}{Starting chunk index to submit}
 
-\item{chunk_end}{Ending chunk index to submit.}
+\item{chunk_end}{Ending chunk index to submit}
 }
 \value{
-... None is returned.
+... None is returned
 }
 \description{
 Bayesian model selection for scRNA-seq count data

@@ -4,19 +4,23 @@
 \alias{fit_count_models}
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
-fit_count_models(y, exposure, nCores = NULL, seed = NULL,
-  model2fit = NULL, brms4zi = FALSE)
+fit_count_models(y, exposure, adapt_delta = 0.8, nCores = NULL,
+  seed = NULL, model2fit = NULL, brms4zi = FALSE)
 }
 \arguments{
-\item{y}{Numeric vector of UMI counts.}
+\item{y}{Numeric vector of UMI counts}
 
-\item{exposure}{Numeric vector of cell sizes (total UMI counts per cell).}
+\item{exposure}{Numeric vector of cell sizes (total UMI counts per cell)}
 
-\item{nCores}{Number of cores.}
+\item{adapt_delta}{The target average proposal acceptance probability during Stan’s adaptation period (default:0.8)}
 
-\item{seed}{Seed number.}
+\item{nCores}{Number of cores}
+
+\item{seed}{Seed number}
 
 \item{model2fit}{A specific model to fit (1:P, 2:NB, 3:ZIP, 4:ZINB, NULL:All)}
+
+\item{brms4zi}{Whether to run brms for zero-inflated models (default is to run rstan::sampling)}
 }
 \value{
 A list of `stanfit` returned by model(s)
