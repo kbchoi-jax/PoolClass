@@ -1,9 +1,9 @@
 #' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
-#' @param loo_results ELPD_loo for models.
+#' @param loo_results ELPD_loo for models
 #' @param margin A multiplier for confidence interval
-#' @return selected_model Reports the model scRATE selects (1:P, 2:NB, 3:ZIP, 4:ZINB).
+#' @return selected_model Reports the model scRATE selects (1:P, 2:NB, 3:ZIP, 4:ZINB)
 #
 select_model <- function(loo_results, margin=2) {
   if (rownames(loo_results)[1] == 'model1') {

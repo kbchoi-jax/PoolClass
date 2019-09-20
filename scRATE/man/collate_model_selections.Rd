@@ -13,7 +13,7 @@ collate_model_selections(loo_dir, globstr = "_scrate*", margin = 2,
 
 \item{globstr}{Search string (wildcard supported) for loo result files (in RDS format)}
 
-\item{margin}{A multiplier for standard deviation (SD) in leave-one-out ELPD for calling models.}
+\item{margin}{A multiplier for standard deviation (SD) in leave-one-out ELPD for calling models}
 
 \item{loo_outfile}{Name of the file to save collated leave-one-out ELPD results (optional)}
 

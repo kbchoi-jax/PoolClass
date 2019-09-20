@@ -23,7 +23,7 @@ fit_count_models <- function(y, exposure, adapt_delta=0.8, nCores=NULL, seed=NUL
   fitting <- list()
 
   if(is.null(model2fit) || model2fit==1) {
-    message('Fitting data with Poisson model..')
+    message('Fitting data with Poisson model...')
     fitting[["P"]] <- stan_glm(y ~ 1,
                                family = poisson,
                                offset = exposure,

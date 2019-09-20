@@ -1,8 +1,8 @@
 #' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
-#' @param model_fit A list of four model fits.
-#' @return loo_results ELPD_loo results.
+#' @param model_fit A list of four model fits
+#' @return ELPD_loo result
 #
 compare_count_models <- function(model_fit) {
   loo_1 <- loo(model_fit$P)
