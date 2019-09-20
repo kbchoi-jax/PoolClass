@@ -45,7 +45,10 @@ fit_count_models <- function(y, exposure, adapt_delta=0.8, nCores=NULL, seed=NUL
   }
 
   if(is.null(model2fit) || model2fit==3) {
+<<<<<<< HEAD
     message('Fitting data with Zero-Inflated Poisson model...')
+=======
+>>>>>>> 5d739eead4cbd87cffb1c75f5a24acad8da07319
     myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
                            data = gexpr,
                            family = zero_inflated_poisson())
@@ -76,7 +79,10 @@ fit_count_models <- function(y, exposure, adapt_delta=0.8, nCores=NULL, seed=NUL
   }
 
   if(is.null(model2fit) || model2fit==4) {
+<<<<<<< HEAD
     message('Fitting data with Zero-Inflated Negative Binomial model...')
+=======
+>>>>>>> 5d739eead4cbd87cffb1c75f5a24acad8da07319
     myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
                            data = gexpr,
                            family = zero_inflated_negbinomial())
