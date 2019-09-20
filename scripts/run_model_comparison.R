@@ -23,7 +23,7 @@ for (gg in c(1:num_genes)) {
     y <- round(unlist(cntmat[gg,]))
     cat(sprintf("\nTesting %s\n", gname[gg]))
     tryCatch({
-      model_fit <- fit_count_models(y, exposure, nCores, seed, adapt_delta = 0.95, brms4zi=FALSE)
+      model_fit <- fit_count_models(y, exposure, nCores, seed, adapt_delta = 0.95, brms4zi=TRUE)
       results.elpd_loo[[gname[gg]]] <- compare_count_models(model_fit)
       results.mean_par[[gname[gg]]] <- get_model_params(model_fit)
     }, error = function(err) {
