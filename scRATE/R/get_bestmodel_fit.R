@@ -1,10 +1,10 @@
 #' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
-#' @param cntfile Expression quantity file (RData format: Use 'save' and 'load').
-#' @param nCores Number of cores.
-#' @param seed Seed number.
-#' @param outfile Output file name to store ELPD_loo results (RDS format).
+#' @param cntfile Expression quantity file (RData format: Use 'save' and 'load')
+#' @param nCores Number of cores
+#' @param seed Seed number
+#' @param outfile Output file name to store ELPD_loo results (RDS format)
 #' @return A list of model fits (only available when outfile is not specified)
 #'
 get_bestmodel_fit <- function(cntfile, nCores=NULL, seed=NULL, outfile=NULL) {

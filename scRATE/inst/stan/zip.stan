@@ -1,4 +1,5 @@
-// generated with brms 2.8.0
+// generated with brms 2.9.0
+// modified by kbchoi on 9/20/2019
 functions {
 
   /* zero-inflated poisson log-PDF of a single response 
@@ -89,7 +90,6 @@ data {
   int<lower=1> N;  // number of observations
   int Y[N];  // response variable
   vector[N] offset;
-  vector[N] offset_zi;
   int prior_only;  // should the likelihood be ignored?
   int df;
   real loc;
@@ -103,7 +103,7 @@ parameters {
 }
 transformed parameters {
   vector[N] mu = temp_Intercept + rep_vector(0, N) + offset;
-  vector[N] zi = temp_zi_Intercept + rep_vector(0, N) + offset_zi;
+  vector[N] zi = temp_zi_Intercept + rep_vector(0, N);
 }
 model {
   // priors including all constants
@@ -126,3 +126,4 @@ generated quantities {
     log_lik[n] = zero_inflated_poisson_log_logit_lpmf(Y[n] | mu[n], zi[n]);
   }
 }
+

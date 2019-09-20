@@ -8,13 +8,13 @@ get_bestmodel_fit(cntfile, nCores = NULL, seed = NULL,
   outfile = NULL)
 }
 \arguments{
-\item{cntfile}{Expression quantity file (RData format: Use 'save' and 'load').}
+\item{cntfile}{Expression quantity file (RData format: Use 'save' and 'load')}
 
-\item{nCores}{Number of cores.}
+\item{nCores}{Number of cores}
 
-\item{seed}{Seed number.}
+\item{seed}{Seed number}
 
-\item{outfile}{Output file name to store ELPD_loo results (RDS format).}
+\item{outfile}{Output file name to store ELPD_loo results (RDS format)}
 }
 \value{
 A list of model fits (only available when outfile is not specified)

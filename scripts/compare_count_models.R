@@ -26,7 +26,7 @@ compare_count_models <- function(y, exposure, zip_model, zinb_model, nCores, see
                     refresh=0)
   loo_2 <- loo(fit_2)
 
-  myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
+  myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
                          data = gexpr, 
                          family = zero_inflated_poisson())
   myprior_3_values <- eval(parse(text=gsub("student_t", "c", myprior_3$prior[1])))
@@ -34,7 +34,6 @@ compare_count_models <- function(y, exposure, zip_model, zinb_model, nCores, see
                     data=list(N=length(y), 
                               Y=y, 
                               offset=exposure,
-                              offset_zi=exposure,
                               prior_only=0,
                               df=myprior_3_values[1],
                               loc=myprior_3_values[2],
@@ -43,7 +42,7 @@ compare_count_models <- function(y, exposure, zip_model, zinb_model, nCores, see
                     seed=seed)
   loo_3 <- loo(fit_3)
   
-  myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
+  myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
                        data = gexpr, 
                        family = zero_inflated_negbinomial())
   myprior_4_values <- eval(parse(text=gsub("student_t", "c", myprior_4$prior[1])))
@@ -51,7 +50,6 @@ compare_count_models <- function(y, exposure, zip_model, zinb_model, nCores, see
                     data=list(N=length(y), 
                               Y=y, 
                               offset=exposure,
-                              offset_zi=exposure,
                               prior_only=0,
                               df=myprior_4_values[1],
                               loc=myprior_4_values[2],
@@ -86,7 +84,7 @@ fit_count_models <- function(y, exposure, zip_model, zinb_model, nCores, seed) {
                     seed=seed, 
                     refresh=0)
 
-  myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
+  myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
                          data = gexpr, 
                          family = zero_inflated_poisson())
   myprior_3_values <- eval(parse(text=gsub("student_t", "c", myprior_3$prior[1])))
@@ -94,7 +92,6 @@ fit_count_models <- function(y, exposure, zip_model, zinb_model, nCores, seed) {
                     data=list(N=length(y), 
                               Y=y, 
                               offset=exposure,
-                              offset_zi=exposure,
                               prior_only=0,
                               df=myprior_3_values[1],
                               loc=myprior_3_values[2],
@@ -102,7 +99,7 @@ fit_count_models <- function(y, exposure, zip_model, zinb_model, nCores, seed) {
                     cores = nCores,
                     seed=seed)
 
-  myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1 + offset(exposure)),
+  myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
                        data = gexpr, 
                        family = zero_inflated_negbinomial())
   myprior_4_values <- eval(parse(text=gsub("student_t", "c", myprior_4$prior[1])))
@@ -110,7 +107,6 @@ fit_count_models <- function(y, exposure, zip_model, zinb_model, nCores, seed) {
                     data=list(N=length(y), 
                               Y=y, 
                               offset=exposure,
-                              offset_zi=exposure,
                               prior_only=0,
                               df=myprior_4_values[1],
                               loc=myprior_4_values[2],

@@ -1,16 +1,17 @@
 #' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
-#' @param loo_dir A folder name in which leave-one-out ELPD result files reside.
-#' @param globstr Search string (wildcard supported) for loo result files (in RDS format).
-#' @param margin A multiplier for standard deviation (SD) in leave-one-out ELPD for calling models. 
-#' @param loo_outfile Name of the file to save collated leave-one-out ELPD results (optional).
-#' @param loomfile A expression quantity file (loom format).
-#' @param attr_name Name of the row attribute in loomfile for storing best model calls.
-#' @param verbose Whether to print out overall model calls.
-#' @return best_model_calls Best model calls are also stored in the input loomfile.
+#' @param loo_dir A folder name in which leave-one-out ELPD result files reside
+#' @param globstr Search string (wildcard supported) for loo result files (in RDS format)
+#' @param margin A multiplier for standard deviation (SD) in leave-one-out ELPD for calling models.
+#' @param loo_outfile Name of the file to save collated leave-one-out ELPD results (optional)
+#' @param loomfile A expression quantity file (loom format)
+#' @param attr_name Name of the row attribute in loomfile for storing best model calls
+#' @param verbose Whether to print out overall model calls
+#' @return best_model_calls Best model calls are also stored in the input loomfile
 #'
-collate_model_selections <- function(loo_dir, globstr='_scrate*', margin=2, loo_outfile=NULL, loomfile=NULL, attr_name=NULL, verbose=FALSE) {
+collate_model_selections <- function(loo_dir, globstr='_scrate*', margin=2, loo_outfile=NULL,
+                                     loomfile=NULL, attr_name=NULL, verbose=FALSE) {
   flist <- Sys.glob(file.path(loo_dir, globstr))
   flist <- sort(flist, decreasing = FALSE)
   results <- c()

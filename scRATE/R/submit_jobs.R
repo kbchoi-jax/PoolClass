@@ -1,20 +1,20 @@
 #' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
-#' @param loomfile Expression quantity file (loom format).
-#' @param num_chunks Number of chunks.
-#' @param outdir Name of the folder where results should be stored.
-#' @param dryrun TRUE if you only want to check the job submission commands.
+#' @param loomfile Expression quantity file (loom format)
+#' @param num_chunks Number of chunks
+#' @param outdir Name of the folder where results should be stored
+#' @param dryrun TRUE if you only want to check the job submission commands
 #' @param scriptfile PBS job submission script
 #' @param rfile R script to execute
-#' @param layer Layer name of the count to use in the loom file.
+#' @param layer Layer name of the count to use in the loom file
 #' @param nCores Number of cores to run stan fitting in parallel
 #' @param seed Seed number to reproduce randomized results
-#' @param gene_start Starting gene index to analyze.
-#' @param gene_end Ending gene index to analyze.
-#' @param chunk_start Starting chunk index to submit.
-#' @param chunk_end Ending chunk index to submit.
-#' @return ... None is returned.
+#' @param gene_start Starting gene index to analyze
+#' @param gene_end Ending gene index to analyze
+#' @param chunk_start Starting chunk index to submit
+#' @param chunk_end Ending chunk index to submit
+#' @return ... None is returned
 #'
 submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile, 
                         layer=NULL, nCores=NULL, seed=NULL, 
