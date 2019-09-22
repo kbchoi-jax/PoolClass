@@ -5,7 +5,7 @@
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
 run_model_comparison(cntfile, nCores = NULL, seed = NULL,
-  outfile = NULL)
+  adapt_delta = 0.8, brms4zi = FALSE, outfile = NULL)
 }
 \arguments{
 \item{cntfile}{Expression quantity file (RData format: Use 'save' and 'load')}
@@ -13,6 +13,10 @@ run_model_comparison(cntfile, nCores = NULL, seed = NULL,
 \item{nCores}{Number of cores}
 
 \item{seed}{Seed number}
+
+\item{adapt_delta}{The target average proposal acceptance probability during Stan’s adaptation period (default:0.8)}
+
+\item{brms4zi}{Whether to run brms for zero-inflated models (default is to run rstan::sampling)}
 
 \item{outfile}{Output file name to store ELPD_loo results (RDS format)}
 }

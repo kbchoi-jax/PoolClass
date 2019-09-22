@@ -15,9 +15,9 @@ echo "Removing output log files..."
 rm ${WORKDIR}/submit_model_comparison_on_cluster.sh.o*
 
 echo "Removing temporary data files..."
-rm ${WORKDIR}/_chunk.*
+rm ${WORKDIR}/_chunk*
 
 echo "Removing temporary result files..."
-rm ${WORKDIR}/_scrate_elpd_loo.*
+rm ${WORKDIR}/_scrate*
 
 echo "Done."

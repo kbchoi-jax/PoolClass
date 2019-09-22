@@ -23,33 +23,34 @@ collate_model_selections <- function(loo_dir, globstr='_scrate*', margin=2, loo_
   bestmodel <- c()
   for (g in gsurv) {
     res <- results[[g]]
-    if (rownames(res)[1] == 'model1') {
-      bestmodel <- c(bestmodel, 1)
-    } else if (rownames(res)[1] == 'model2') {
-      if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
-        bestmodel <- c(bestmodel, 1)
-      } else {
-        bestmodel <- c(bestmodel, 2)
-      }
-    } else if (rownames(res)[1] == 'model3') {
-      if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
-        bestmodel <- c(bestmodel, 1)
-      } else if (abs(res['model2',][['elpd_diff']]) < margin * res['model2',][['se_diff']]) {
-        bestmodel <- c(bestmodel, 2)
-      } else {
-        bestmodel <- c(bestmodel, 3)
-      }
-    } else if (rownames(res)[1] == 'model4') {
-      if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
-        bestmodel <- c(bestmodel, 1)
-      } else if (abs(res['model2',][['elpd_diff']]) < margin * res['model2',][['se_diff']]) {
-        bestmodel <- c(bestmodel, 2)
-      } else if (abs(res['model3',][['elpd_diff']]) < margin * res['model3',][['se_diff']]) {
-        bestmodel <- c(bestmodel, 3)
-      } else {
-        bestmodel <- c(bestmodel, 4)
-      }
-    }
+    bestmodel <- c(bestmodel, select_model(results[[g]], margin=margin))
+    # if (rownames(res)[1] == 'model1') {
+    #   bestmodel <- c(bestmodel, 1)
+    # } else if (rownames(res)[1] == 'model2') {
+    #   if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
+    #     bestmodel <- c(bestmodel, 1)
+    #   } else {
+    #     bestmodel <- c(bestmodel, 2)
+    #   }
+    # } else if (rownames(res)[1] == 'model3') {
+    #   if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
+    #     bestmodel <- c(bestmodel, 1)
+    #   } else if (abs(res['model2',][['elpd_diff']]) < margin * res['model2',][['se_diff']]) {
+    #     bestmodel <- c(bestmodel, 2)
+    #   } else {
+    #     bestmodel <- c(bestmodel, 3)
+    #   }
+    # } else if (rownames(res)[1] == 'model4') {
+    #   if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
+    #     bestmodel <- c(bestmodel, 1)
+    #   } else if (abs(res['model2',][['elpd_diff']]) < margin * res['model2',][['se_diff']]) {
+    #     bestmodel <- c(bestmodel, 2)
+    #   } else if (abs(res['model3',][['elpd_diff']]) < margin * res['model3',][['se_diff']]) {
+    #     bestmodel <- c(bestmodel, 3)
+    #   } else {
+    #     bestmodel <- c(bestmodel, 4)
+    #   }
+    # }
   }
 
   if(verbose==TRUE) {
