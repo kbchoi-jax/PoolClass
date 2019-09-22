@@ -29,7 +29,7 @@ run_model_comparison <- function(cntfile, nCores=NULL, seed=NULL, adapt_delta=0.
       y <- round(unlist(cntmat[gg,]))
       cat(sprintf("\nTesting %s\n", gname[gg]))
       tryCatch({
-        fit <- fit_count_models(y, exposure, nCores, seed, adapt_delta = adapt_delta, brms4zi=brms4zi)
+        model_fit <- fit_count_models(y, exposure, nCores, seed, adapt_delta = adapt_delta, brms4zi=brms4zi)
         results[[gname[gg]]] <- list()
         results[[gname[gg]]][['elpd_loo']] <- compare_count_models(model_fit)
         results[[gname[gg]]][['mean_par']] <- get_model_params(model_fit)

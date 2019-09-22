@@ -102,7 +102,7 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     gsurv  <- selected[s:e]
     model2fit <- bestmodel[s:e]
     ifile <- sprintf('%s/_chunk.%05d-%05d.rds', outdir, s, e)
-    ofile <- sprintf('%s/_scrate_elpd_loo.%05d-%05d.rds', outdir, s, e)
+    ofile <- sprintf('%s/_scrate_model_fit.%05d-%05d.rds', outdir, s, e)
     cmdstr <- sprintf('qsub -o %s -e %s -v RFILE=%s,INFILE=%s,OUTFILE=%s,CORES=%d,SEED=%d %s', 
                       outdir, outdir, rfile, ifile, ofile, nCores, seed, scriptfile)
     if(!dryrun) {
