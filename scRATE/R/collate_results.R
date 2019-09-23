@@ -15,6 +15,15 @@ collate_results <- function(loo_dir, globstr='_scrate*', loo_outfile=NULL) {
     results <- c(results, readRDS(flist[i]))
   }
 
+  # Fix names in loo results if needed
+  for (k in 1:length(results)) {
+    loo_results <- results[[k]][['elpd_loo']]
+    m3idx <- which(rownames(loo_results) == 'model_fit$ZIP')
+    if(length(m3idx)) { rownames(results[[k]][['elpd_loo']])[m3idx] <- 'model3' }
+    m4idx <- which(rownames(loo_results) == 'model_fit$ZINB')
+    if(length(m4idx)) { rownames(results[[k]][['elpd_loo']])[m4idx] <- 'model4' }
+  }
+
   if (!is.null(loo_outfile)) {
     saveRDS(results, file=loo_outfile)
   } else {

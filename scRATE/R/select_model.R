@@ -6,6 +6,12 @@
 #' @return selected_model Reports the model scRATE selects (1:P, 2:NB, 3:ZIP, 4:ZINB)
 #
 select_model <- function(loo_results, margin=2) {
+
+  m3idx <- which(rownames(loo_results) == 'model_fit$ZIP')
+  if(length(m3idx)) { rownames(loo_results)[m3idx] <- 'model3' }
+  m4idx <- which(rownames(loo_results) == 'model_fit$ZINB')
+  if(length(m4idx)) { rownames(loo_results)[m4idx] <- 'model4' }
+
   if (rownames(loo_results)[1] == 'model1') {
     return(1)
   } else if (rownames(loo_results)[1] == 'model2') {
@@ -33,4 +39,5 @@ select_model <- function(loo_results, margin=2) {
       return(4)
     }
   }
+
 }
