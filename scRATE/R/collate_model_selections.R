@@ -1,49 +1,19 @@
 #' Bayesian model selection for scRNA-seq count data
 #'
 #' @export
-#' @param fit_file A file name that contains model fitting result reside
+#' @param fit_list A list of model fitting results
 #' @param margin A multiplier for standard deviation (SD) in leave-one-out ELPD for calling models
 #' @param loomfile A expression quantity file (loom format)
 #' @param attr_name Name of the row attribute in loomfile for storing best model calls
 #' @param verbose Whether to print out overall model calls
 #' @return best_model_calls Best model calls are also stored in the input loomfile
 #'
-collate_model_selections <- function(fit_file, margin=2, loomfile=NULL, attr_name=NULL, verbose=FALSE) {
+collate_model_selections <- function(fit_list, margin=2, loomfile=NULL, attr_name=NULL, verbose=FALSE) {
                                      
-  results <- readRDS(fit_file)
-  gsurv <- names(results)
-
+  gsurv <- names(fit_list)
   bestmodel <- c()
   for (g in gsurv) {
-    # res <- results[[g]]
-    bestmodel <- c(bestmodel, select_model(results[[g]][['elpd_loo']], margin=margin))
-    # if (rownames(res)[1] == 'model1') {
-    #   bestmodel <- c(bestmodel, 1)
-    # } else if (rownames(res)[1] == 'model2') {
-    #   if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
-    #     bestmodel <- c(bestmodel, 1)
-    #   } else {
-    #     bestmodel <- c(bestmodel, 2)
-    #   }
-    # } else if (rownames(res)[1] == 'model3') {
-    #   if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
-    #     bestmodel <- c(bestmodel, 1)
-    #   } else if (abs(res['model2',][['elpd_diff']]) < margin * res['model2',][['se_diff']]) {
-    #     bestmodel <- c(bestmodel, 2)
-    #   } else {
-    #     bestmodel <- c(bestmodel, 3)
-    #   }
-    # } else if (rownames(res)[1] == 'model4') {
-    #   if (abs(res['model1',][['elpd_diff']]) < margin * res['model1',][['se_diff']]) {
-    #     bestmodel <- c(bestmodel, 1)
-    #   } else if (abs(res['model2',][['elpd_diff']]) < margin * res['model2',][['se_diff']]) {
-    #     bestmodel <- c(bestmodel, 2)
-    #   } else if (abs(res['model3',][['elpd_diff']]) < margin * res['model3',][['se_diff']]) {
-    #     bestmodel <- c(bestmodel, 3)
-    #   } else {
-    #     bestmodel <- c(bestmodel, 4)
-    #   }
-    # }
+    bestmodel <- c(bestmodel, select_model(fit_list[[g]][['elpd_loo']], margin=margin))
   }
 
   if(verbose==TRUE) {
@@ -51,7 +21,7 @@ collate_model_selections <- function(fit_file, margin=2, loomfile=NULL, attr_nam
     cat(sprintf('%5d Negative Binomial genes\n', sum(bestmodel==2)))
     cat(sprintf('%5d Zero-Inflated Poisson genes\n', sum(bestmodel==3)))
     cat(sprintf('%5d Zero-Inflated Neg. Binomial genes\n', sum(bestmodel==4)))
-    cat(sprintf('%5d Total\n', length(results)))
+    cat(sprintf('%5d Total\n', length(fit_list)))
   }
 
   if(is.null(loomfile)) {
