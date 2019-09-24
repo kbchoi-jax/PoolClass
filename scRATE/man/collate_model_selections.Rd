@@ -4,11 +4,11 @@
 \alias{collate_model_selections}
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
-collate_model_selections(fit_file, margin = 2, loomfile = NULL,
+collate_model_selections(fit_list, margin = 2, loomfile = NULL,
   attr_name = NULL, verbose = FALSE)
 }
 \arguments{
-\item{fit_file}{A file name that contains model fitting result reside}
+\item{fit_list}{A list of model fitting results}
 
 \item{margin}{A multiplier for standard deviation (SD) in leave-one-out ELPD for calling models}
 
@@ -19,7 +19,7 @@ collate_model_selections(fit_file, margin = 2, loomfile = NULL,
 \item{verbose}{Whether to print out overall model calls}
 }
 \value{
-best_model_calls Best model calls are also stored in the input loomfile
+modelcall Models called for genes. Stored in the input loomfile if provided.
 }
 \description{
 Bayesian model selection for scRNA-seq count data
