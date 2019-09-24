@@ -22,7 +22,7 @@ results <- list()
 for (gg in c(1:num_genes)) {
   if(gsurv[gg]) {
     y <- round(unlist(cntmat[gg,]))
-    cat(sprintf("\nTesting %s\n", gname[gg]))
+    cat(sprintf("\nFitting models for %s\n", gname[gg]))
     tryCatch({
       model_fit <- fit_count_models(y, exposure, nCores, seed, brms4zi = TRUE)
       elpd_loo <- compare_count_models(model_fit)

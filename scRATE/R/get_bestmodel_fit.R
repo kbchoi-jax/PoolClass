@@ -25,7 +25,7 @@ get_bestmodel_fit <- function(cntfile, nCores=NULL, seed=NULL, outfile=NULL) {
   for (gg in c(1:num_genes)) {
     if(gsurv[gg]) {
       y <- round(unlist(cntmat[gg,]))
-      cat(sprintf("\nTesting %s\n", gname[gg]))
+      cat(sprintf("\nFitting models for %s\n", gname[gg]))
       tryCatch({
         results[[gname[gg]]] <- fit_count_models(y, exposure, nCores, seed, model2fit=model2fit[gg], brms4zi=TRUE)
       }, error = function(err) {
