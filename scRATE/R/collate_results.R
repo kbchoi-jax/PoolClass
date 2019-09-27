@@ -26,11 +26,16 @@ collate_results <- function(loo_dir, globstr='_scrate*', loo_outfile=NULL) {
 
   # Fix names in loo results if needed
   for (k in 1:length(results)) {
-    loo_results <- results[[k]][['elpd_loo']]
-    m3idx <- which(rownames(loo_results) == 'model_fit$ZIP')
-    if(length(m3idx)) { rownames(results[[k]][['elpd_loo']])[m3idx] <- 'model3' }
-    m4idx <- which(rownames(loo_results) == 'model_fit$ZINB')
-    if(length(m4idx)) { rownames(results[[k]][['elpd_loo']])[m4idx] <- 'model4' }
+    if(length(results[[k]]) > 0) {
+      loo_results <- results[[k]][['elpd_loo']]
+      m3idx <- which(rownames(loo_results) == 'model_fit$ZIP')
+      if(length(m3idx)) { rownames(results[[k]][['elpd_loo']])[m3idx] <- 'model3' }
+      m4idx <- which(rownames(loo_results) == 'model_fit$ZINB')
+      if(length(m4idx)) { rownames(results[[k]][['elpd_loo']])[m4idx] <- 'model4' }
+    } else {
+      message(sprintf('Gene %s failed to fit for some reason. Check the log.', names(results[[k]])))
+      results[[k]] <- NULL  # Remove gene name
+    }
   }
 
   if (!is.null(loo_outfile)) {
