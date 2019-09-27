@@ -19,7 +19,7 @@ collate_results <- function(loo_dir, globstr='_scrate*', loo_outfile=NULL) {
   gsurv <- names(results)
   for (g in gsurv) {
     if(length(results[[g]]) == 0) {
-      cat(sprintf('Gene %s failed to fit for some reason. Check the log.', g))
+      cat(sprintf('Gene %s failed to fit for some reason. Check the log.\n', g))
       flush.console()
       results[[g]] <- NULL  # Remove gene name
     }
