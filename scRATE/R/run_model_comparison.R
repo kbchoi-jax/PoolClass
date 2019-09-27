@@ -30,9 +30,11 @@ run_model_comparison <- function(cntfile, nCores=NULL, seed=NULL, adapt_delta=0.
       cat(sprintf("\nFitting models for %s\n", gname[gg]))
       tryCatch({
         model_fit <- fit_count_models(y, exposure, nCores, seed, adapt_delta = adapt_delta, brms4zi=brms4zi)
+        elpd_loo <- compare_count_models(model_fit)
+        mean_par <- get_model_params(model_fit)
         results[[gname[gg]]] <- list()
-        results[[gname[gg]]][['elpd_loo']] <- compare_count_models(model_fit)
-        results[[gname[gg]]][['mean_par']] <- get_model_params(model_fit)
+        results[[gname[gg]]][['elpd_loo']] <- elpd_loo
+        results[[gname[gg]]][['mean_par']] <- mean_par
       }, error = function(err) {
         cat(sprintf("Error while fitting %s\n", gname[gg]))
       })

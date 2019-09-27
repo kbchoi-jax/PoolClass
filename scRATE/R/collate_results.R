@@ -15,6 +15,15 @@ collate_results <- function(loo_dir, globstr='_scrate*', loo_outfile=NULL) {
     results <- c(results, readRDS(flist[i]))
   }
 
+  # Remove genes that failed to fit for some reason, if any
+  gsurv <- names(results)
+  for (g in gsurv) {
+    if(length(results[[g]]) == 0) {
+      message(sprintf('Gene %s failed to fit for some reason. Check the log.', names(results[[g]])))
+      results[[g]] <- NULL  # Remove gene name
+    }
+  }
+
   # Fix names in loo results if needed
   for (k in 1:length(results)) {
     loo_results <- results[[k]][['elpd_loo']]
