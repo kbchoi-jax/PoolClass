@@ -8,7 +8,7 @@
 #' @param verbose Whether to print out overall model calls
 #' @return modelcall Models called for genes. Stored in the input loomfile if provided.
 #'
-collate_model_selections <- function(fit_list, margin=2, loomfile=NULL, attr_name=NULL, verbose=FALSE) {
+perform_model_selection <- function(fit_list, margin=2, loomfile=NULL, attr_name=NULL, verbose=FALSE) {
                                      
   gsurv <- names(fit_list)
   modelcall <- c()
