@@ -3,6 +3,7 @@
 #' @export
 #' @param y Numeric vector of UMI counts
 #' @param exposure Numeric vector of cell sizes (total UMI counts per cell)
+#' @param ctype Factorized of cell types (Cluster IDs)
 #' @param adapt_delta  The target average proposal acceptance probability during Stan’s adaptation period (default:0.8)
 #' @param nCores Number of cores
 #' @param seed Seed number
@@ -10,7 +11,7 @@
 #' @param brms4zi Whether to run brms for zero-inflated models (default is to run rstan::sampling)
 #' @return A list of `stanfit` returned by model(s)
 #'
-fit_count_models <- function(y, exposure, adapt_delta=0.8, nCores=NULL, seed=NULL, model2fit=NULL, brms4zi=FALSE) {
+fit_count_models <- function(y, exposure, ctype=NULL, adapt_delta=0.8, nCores=NULL, seed=NULL, model2fit=NULL, brms4zi=FALSE) {
 
   if(is.null(nCores)) {
     nCores <- min(4, parallel::detectCores())
@@ -24,41 +25,79 @@ fit_count_models <- function(y, exposure, adapt_delta=0.8, nCores=NULL, seed=NUL
 
   if(is.null(model2fit) || model2fit==1) {
     message('Fitting data with Poisson model...')
-    fitting[["P"]] <- stan_glm(y ~ 1,
-                               family = poisson,
-                               offset = exposure,
-                               data = gexpr,
-                               cores = nCores,
-                               seed = seed,
-                               refresh = 0)
+    if(is.null(ctype)) {
+      fitting[["P"]] <- stan_glm(y ~ 1,
+                                 family = poisson,
+                                 offset = exposure,
+                                 data = gexpr,
+                                 cores = nCores,
+                                 seed = seed,
+                                 refresh = 0)
+    } else {
+      fitting[["P"]] <- stan_glmer(y ~ 1 + (1 | ctype),
+                                   family = poisson,
+                                   offset = exposure,
+                                   data = gexpr,
+                                   cores = nCores,
+                                   seed = seed,
+                                   refresh = 0)      
+    }
   }
 
   if(is.null(model2fit) || model2fit==2) {
     message('Fitting data with Negative Binomial model...')
-    fitting[["NB"]] <- stan_glm(y ~ 1,
-                                family = neg_binomial_2,
-                                offset = exposure,
-                                data = gexpr,
-                                cores = nCores,
-                                seed = seed,
-                                refresh = 0)
+    if(is.null(ctype)) {
+      fitting[["NB"]] <- stan_glm(y ~ 1,
+                                  family = neg_binomial_2,
+                                  offset = exposure,
+                                  data = gexpr,
+                                  cores = nCores,
+                                  seed = seed,
+                                  refresh = 0)
+    } else {
+      fitting[["NB"]] <- stan_glmer(y ~ 1 + (1 | ctype),
+                                    family = neg_binomial_2,
+                                    offset = exposure,
+                                    data = gexpr,
+                                    cores = nCores,
+                                    seed = seed,
+                                    refresh = 0)
+    }
   }
 
   if(is.null(model2fit) || model2fit==3) {
     message('Fitting data with Zero-Inflated Poisson model...')
-    myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
-                           data = gexpr,
-                           family = zero_inflated_poisson())
-    myprior_3_values <- eval(parse(text=gsub("student_t", "c", myprior_3$prior[1])))
+    if(is.null(ctype)) {
+      myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
+                             family = zero_inflated_poisson(),
+                             data = gexpr)
+      myprior_3_values <- eval(parse(text=gsub("student_t", "c", myprior_3$prior[1])))
+    } else {
+      myprior_3 <- get_prior(bf(y ~ 1 + offset(exposure) + (1 | ctype), zi ~ 1),
+                             family = zero_inflated_poisson(),
+                             data = gexpr)
+      myprior_3_values <- eval(parse(text=gsub("student_t", "c", myprior_3$prior[1])))
+    }
     if(brms4zi) {
-      fit_3 <- brm(bf(y ~ 1 + offset(exposure), zi ~ 1),
-                   family = zero_inflated_poisson(),
-                   data = gexpr,
-                   prior = myprior_3,
-                   control = list(adapt_delta = adapt_delta),
-                   cores = nCores,
-                   seed = seed,
-                   refresh = 500)
+      if(is.null(ctype)) {
+        fit_3 <- brm(bf(y ~ 1 + offset(exposure), zi ~ 1),
+                     family = zero_inflated_poisson(),
+                     data = gexpr,
+                     prior = myprior_3,
+                     control = list(adapt_delta = adapt_delta),
+                     cores = nCores,
+                     seed = seed,
+                     refresh = 500)
+      } else {
+        fit_3 <- brm(bf(y ~ 1 + offset(exposure) + (1 | ctype), zi ~ 1),
+                     family = zero_inflated_poisson(),
+                     data = gexpr,
+                     prior = myprior_3,
+                     control = list(adapt_delta = adapt_delta),
+                     cores = nCores,
+                     seed = seed,
+                     refresh = 500)
+      }
     } else {
       fit_3 <- rstan::sampling(stanmodels$zip,
                                data=list(N = length(y),
@@ -77,19 +116,37 @@ fit_count_models <- function(y, exposure, adapt_delta=0.8, nCores=NULL, seed=NUL
 
   if(is.null(model2fit) || model2fit==4) {
     message('Fitting data with Zero-Inflated Negative Binomial model...')
-    myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
-                           data = gexpr,
-                           family = zero_inflated_negbinomial())
-    myprior_4_values <- eval(parse(text=gsub("student_t", "c", myprior_4$prior[1])))
+    if(is.null(ctype)) {
+      myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure), zi ~ 1),
+                             family = zero_inflated_negbinomial(),
+                             data = gexpr)
+      myprior_4_values <- eval(parse(text=gsub("student_t", "c", myprior_4$prior[1])))
+    } else {
+      myprior_4 <- get_prior(bf(y ~ 1 + offset(exposure) + (1 | ctype), zi ~ 1),
+                             family = zero_inflated_negbinomial(),
+                             data = gexpr)
+      myprior_4_values <- eval(parse(text=gsub("student_t", "c", myprior_4$prior[1])))
+    }
     if (brms4zi) {
-      fit_4 <- brm(bf(y ~ 1 + offset(exposure), zi ~ 1),
-                   family = zero_inflated_negbinomial(),
-                   data = gexpr,
-                   control = list(adapt_delta = adapt_delta),
-                   prior = myprior_4,
-                   cores = nCores,
-                   seed = seed,
-                   refresh = 500)
+      if(is.null(ctype)) {
+        fit_4 <- brm(bf(y ~ 1 + offset(exposure), zi ~ 1),
+                     family = zero_inflated_negbinomial(),
+                     data = gexpr,
+                     control = list(adapt_delta = adapt_delta),
+                     prior = myprior_4,
+                     cores = nCores,
+                     seed = seed,
+                     refresh = 500)
+      } else {
+        fit_4 <- brm(bf(y ~ 1 + offset(exposure) + (1 | ctype), zi ~ 1),
+                     family = zero_inflated_negbinomial(),
+                     data = gexpr,
+                     control = list(adapt_delta = adapt_delta),
+                     prior = myprior_4,
+                     cores = nCores,
+                     seed = seed,
+                     refresh = 500)
+      }
     } else {
       fit_4 <- rstan::sampling(stanmodels$zinb,
                                data=list(N = length(y),
