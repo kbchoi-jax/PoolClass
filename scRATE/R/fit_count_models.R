@@ -20,7 +20,11 @@ fit_count_models <- function(y, exposure, ctype=NULL, nCores=NULL, seed=NULL, ad
     seed <- 1004
   }
 
-  gexpr <- data.frame(y, exposure)
+  if(is.null(ctype)) {
+    gexpr <- data.frame(y, exposure)
+  } else {
+    gexpr <- data.frame(y, exposure, ctype)
+  }
   fitting <- list()
 
   if(is.null(model2fit) || model2fit==1) {
