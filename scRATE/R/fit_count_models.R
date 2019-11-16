@@ -11,7 +11,7 @@
 #' @param brms4zi Whether to run brms for zero-inflated models (default is to run rstan::sampling)
 #' @return A list of `stanfit` returned by model(s)
 #'
-fit_count_models <- function(y, exposure, ctype=NULL, adapt_delta=0.8, nCores=NULL, seed=NULL, model2fit=NULL, brms4zi=FALSE) {
+fit_count_models <- function(y, exposure, ctype=NULL, nCores=NULL, seed=NULL, adapt_delta=0.8, model2fit=NULL, brms4zi=FALSE) {
 
   if(is.null(nCores)) {
     nCores <- min(4, parallel::detectCores())

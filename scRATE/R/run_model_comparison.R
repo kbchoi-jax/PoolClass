@@ -18,7 +18,7 @@ run_model_comparison <- function(cntfile, nCores=NULL, seed=NULL, adapt_delta=0.
     seed <- 1004
   }
 
-  load(cntfile)  # This will load 'cntmat', 'gsurv', and 'csize'
+  load(cntfile)  # This will load 'cntmat', 'gsurv', 'csize', and 'ctype'
   gname <- rownames(cntmat)
   num_genes <- length(gsurv)
   exposure <- log(csize)
@@ -29,9 +29,9 @@ run_model_comparison <- function(cntfile, nCores=NULL, seed=NULL, adapt_delta=0.
       y <- round(unlist(cntmat[gg,]))
       cat(sprintf("\nFitting models for %s\n", gname[gg]))
       tryCatch({
-        model_fit <- fit_count_models(y, exposure, nCores, seed, adapt_delta = adapt_delta, brms4zi=brms4zi)
+        model_fit <- fit_count_models(y, exposure, ctype, nCores, seed, adapt_delta = adapt_delta, brms4zi=brms4zi)
         elpd_loo <- compare_count_models(model_fit)
-        mean_par <- get_model_params(model_fit)
+        mean_par <- get_model_params(model_fit, ctyped=!is.null(ctype))
         results[[gname[gg]]] <- list()
         results[[gname[gg]]][['elpd_loo']] <- elpd_loo
         results[[gname[gg]]][['mean_par']] <- mean_par

@@ -4,19 +4,22 @@
 \alias{fit_count_models}
 \title{Bayesian model selection for scRNA-seq count data}
 \usage{
-fit_count_models(y, exposure, adapt_delta = 0.8, nCores = NULL,
-  seed = NULL, model2fit = NULL, brms4zi = FALSE)
+fit_count_models(y, exposure, ctype = NULL, nCores = NULL,
+  seed = NULL, adapt_delta = 0.8, model2fit = NULL,
+  brms4zi = FALSE)
 }
 \arguments{
 \item{y}{Numeric vector of UMI counts}
 
 \item{exposure}{Numeric vector of cell sizes (total UMI counts per cell)}
 
-\item{adapt_delta}{The target average proposal acceptance probability during Stan’s adaptation period (default:0.8)}
+\item{ctype}{Factorized of cell types (Cluster IDs)}
 
 \item{nCores}{Number of cores}
 
 \item{seed}{Seed number}
+
+\item{adapt_delta}{The target average proposal acceptance probability during Stan’s adaptation period (default:0.8)}
 
 \item{model2fit}{A specific model to fit (1:P, 2:NB, 3:ZIP, 4:ZINB, NULL:All)}
 

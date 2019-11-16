@@ -43,6 +43,7 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     selected <- ds$row.attrs$`Selected`[]
   }
   bestmodel <- ds$row.attrs$BestModel[]
+  ctype <- factor(ds$col.attrs$CellType[])
   ds$close_all()
 
   if(is.null(gene_start)) {
@@ -106,7 +107,7 @@ submit_jobs <- function(loomfile, num_chunks, outdir, dryrun, scriptfile, rfile,
     cmdstr <- sprintf('qsub -o %s -e %s -v RFILE=%s,INFILE=%s,OUTFILE=%s,CORES=%d,SEED=%d %s', 
                       outdir, outdir, rfile, ifile, ofile, nCores, seed, scriptfile)
     if(!dryrun) {
-      save(cntmat, gsurv, csize, model2fit, file = ifile)
+      save(cntmat, gsurv, csize, ctype, model2fit, file = ifile)
       cat(cmdstr, '\n')
       system(cmdstr)
       Sys.sleep(1)
