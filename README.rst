@@ -2,7 +2,7 @@
 PoolClass
 =========
 
-PoolClass is a model selection-based scRNA-seq quantitation algorithm that controls overfitting and unwarranted imputation of technical zeros. We first fit UMI counts with Poisson, Negative-Binomial, and Zero-inflated Negative Binomial models. These models are applicable to UMI counts directly and therefore no need of arbitrary preprocessing of counts, e.g., normalization (by scaling to, for example, CPM) or log-transformation (with pseudocounts). Our model comparison enables us to compute denoised rates of gene expression using the best model which each gene data is conforming to.
+PoolClass is a novel partial-pooling model that embraces uncertainty in clustering for profiling cell-type-specific allele-specific and total gene expression from single-cell RNA sequencing data.
 
 
 * Free software: MIT license
@@ -12,5 +12,5 @@ PoolClass is a model selection-based scRNA-seq quantitation algorithm that contr
 How to cite
 -----------
 
-* Manuscript in preparation (expected in 2019)
+* Manuscript in preparation (expected in 2020)
 
